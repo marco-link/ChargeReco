@@ -1,0 +1,28 @@
+<lcgdict>
+    <class name="wbwbx::ShallowTagInfoFeatures"/>
+    <class name="wbwbx::JetFeatures"/>
+    <class name="wbwbx::SecondaryVertexFeatures"/>
+    <class name="wbwbx::ChargedCandidateFeatures"/>
+    <class name="wbwbx::NeutralCandidateFeatures"/>
+    <class name="wbwbx::XTagFeatures"/>
+    <class name="reco::XTagInfo"/>
+    <class name="reco::FeaturesTagInfo<wbwbx::XTagFeatures>"/>
+    <class name="reco::XTagInfoCollection"/>
+    <class name="reco::XTagInfoRef"/>
+
+    <class name="edm::Wrapper<reco::FeaturesTagInfo<wbwbx:XTagFeatures> >"/>
+    <class name="edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>>>"/>
+    <class name="std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>>"/>
+
+    <class name="edm::reftobase::Holder<reco::BaseTagInfo, reco::XTagInfoRef>" />
+    <class name="edm::reftobase::RefHolder<reco::XTagInfoRef>" />
+  
+    <class name="edm::PtrVector<reco::GenParticle>"/>
+    <class name="edm::Wrapper<edm::PtrVector<reco::GenParticle>>"/>
+    
+    <class name="wbwbx::JetChargeLabel"/>
+    <class name="reco::FeaturesTagInfo<wbwbx::JetChargeLabel>"/>
+    <class name="std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeLabel>>"/>
+    <class name="edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeLabel>>>"/>
+    
+</lcgdict>
