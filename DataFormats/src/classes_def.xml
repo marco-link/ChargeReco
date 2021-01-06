@@ -4,18 +4,18 @@
     <class name="wbwbx::SecondaryVertexFeatures"/>
     <class name="wbwbx::ChargedCandidateFeatures"/>
     <class name="wbwbx::NeutralCandidateFeatures"/>
-    <class name="wbwbx::XTagFeatures"/>
-    <class name="reco::XTagInfo"/>
-    <class name="reco::FeaturesTagInfo<wbwbx::XTagFeatures>"/>
-    <class name="reco::XTagInfoCollection"/>
-    <class name="reco::XTagInfoRef"/>
+    <class name="wbwbx::JetChargeTagFeatures"/>
+    <class name="reco::JetChargeTagInfo"/>
+    <class name="reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>"/>
+    <class name="reco::JetChargeTagInfoCollection"/>
+    <class name="reco::JetChargeTagInfoRef"/>
 
-    <class name="edm::Wrapper<reco::FeaturesTagInfo<wbwbx:XTagFeatures> >"/>
-    <class name="edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>>>"/>
-    <class name="std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>>"/>
+    <class name="edm::Wrapper<reco::FeaturesTagInfo<wbwbx:JetChargeTagFeatures> >"/>
+    <class name="edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>>>"/>
+    <class name="std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>>"/>
 
-    <class name="edm::reftobase::Holder<reco::BaseTagInfo, reco::XTagInfoRef>" />
-    <class name="edm::reftobase::RefHolder<reco::XTagInfoRef>" />
+    <class name="edm::reftobase::Holder<reco::BaseTagInfo, reco::JetChargeTagInfoRef>" />
+    <class name="edm::reftobase::RefHolder<reco::JetChargeTagInfoRef>" />
   
     <class name="edm::PtrVector<reco::GenParticle>"/>
     <class name="edm::Wrapper<edm::PtrVector<reco::GenParticle>>"/>

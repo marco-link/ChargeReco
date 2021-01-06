@@ -1,5 +1,5 @@
-#ifndef ChargeReco_XTagInfoProducer_JetSubstructure_h
-#define ChargeReco_XTagInfoProducer_JetSubstructure_h
+#ifndef ChargeReco_JetChargeInfoProducer_JetSubstructure_h
+#define ChargeReco_JetChargeInfoProducer_JetSubstructure_h
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "PhysicsTools/CandUtils/interface/EventShapeVariables.h"

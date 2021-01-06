@@ -1,5 +1,5 @@
-#ifndef ChargeReco_DataFormats_XTagFeatures_h
-#define ChargeReco_DataFormats_XTagFeatures_h
+#ifndef ChargeReco_DataFormats_JetChargeTagFeatures_h
+#define ChargeReco_DataFormats_JetChargeTagFeatures_h
 
 #include <vector>
 #include "ChargeReco/DataFormats/interface/JetFeatures.h"
@@ -9,9 +9,10 @@
 #include "ChargeReco/DataFormats/interface/ChargedCandidateFeatures.h"
 #include "ChargeReco/DataFormats/interface/MuonCandidateFeatures.h"
 #include "ChargeReco/DataFormats/interface/ElectronCandidateFeatures.h"
+
 namespace wbwbx {
 
-class XTagFeatures {
+class JetChargeTagFeatures {
 
   public:
     JetFeatures jet_features;

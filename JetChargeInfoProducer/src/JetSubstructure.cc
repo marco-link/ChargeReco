@@ -1,4 +1,4 @@
-#include "ChargeReco/XTagInfoProducer/interface/JetSubstructure.h"
+#include "ChargeReco/JetChargeInfoProducer/interface/JetSubstructure.h"
 
 namespace wbwbx
 {

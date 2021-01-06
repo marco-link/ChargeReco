@@ -22,7 +22,7 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
-#include "ChargeReco/DataFormats/interface/XTagInfo.h"
+#include "ChargeReco/DataFormats/interface/JetChargeTagInfo.h"
 
 #include "RecoBTag/FeatureTools/interface/JetConverter.h"
 #include "RecoBTag/FeatureTools/interface/ShallowTagInfoConverter.h"
@@ -45,16 +45,16 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
-#include "ChargeReco/XTagInfoProducer/interface/JetSubstructure.h"
+#include "ChargeReco/JetChargeInfoProducer/interface/JetSubstructure.h"
 
 #include "TVector3.h"
 
 
 
-class XTagInfoProducer : public edm::stream::EDProducer<> {
+class JetChargeTagInfoProducer : public edm::stream::EDProducer<> {
 public:
-    explicit XTagInfoProducer(const edm::ParameterSet&);
-    ~XTagInfoProducer();
+    explicit JetChargeTagInfoProducer(const edm::ParameterSet&);
+    ~JetChargeTagInfoProducer();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
     
     struct CandidateHash
@@ -76,13 +76,13 @@ public:
         edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> sv_token_;
         edm::EDGetTokenT<edm::View<reco::ShallowTagInfo>> shallow_tag_info_token_;
         edm::EDGetTokenT<edm::View<reco::Candidate>> candidateToken_;
-        typedef std::vector<reco::XTagInfo> XTagInfoCollection;
+        typedef std::vector<reco::JetChargeTagInfo> JetChargeTagInfoCollection;
 
         edm::EDGetTokenT< pat::MuonCollection > muonsMiniAODToken_;
         edm::EDGetTokenT< pat::ElectronCollection > electronsMiniAODToken_;
 };
 
-XTagInfoProducer::XTagInfoProducer(const edm::ParameterSet& iConfig) :
+JetChargeTagInfoProducer::JetChargeTagInfoProducer(const edm::ParameterSet& iConfig) :
     jet_token_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("jets"))),
     vtx_token_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
     sv_token_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secondary_vertices"))),
@@ -90,17 +90,17 @@ XTagInfoProducer::XTagInfoProducer(const edm::ParameterSet& iConfig) :
     muonsMiniAODToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muonSrc"))),
     electronsMiniAODToken_(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electronSrc")))
 {
-    produces<XTagInfoCollection>();
+    produces<JetChargeTagInfoCollection>();
 }
 
 
-XTagInfoProducer::~XTagInfoProducer(){ }
-void XTagInfoProducer::beginStream(edm::StreamID) { }
+JetChargeTagInfoProducer::~JetChargeTagInfoProducer(){ }
+void JetChargeTagInfoProducer::beginStream(edm::StreamID) { }
 // ------------ method called to produce the data  ------------
     void
-XTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+JetChargeTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-    auto output_tag_infos = std::make_unique<XTagInfoCollection>();
+    auto output_tag_infos = std::make_unique<JetChargeTagInfoCollection>();
     edm::Handle<edm::View<pat::Jet>> jets;
     iEvent.getByToken(jet_token_, jets);
 
@@ -184,7 +184,7 @@ XTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         */
 
         // create data containing structure
-        wbwbx::XTagFeatures features;
+        wbwbx::JetChargeTagFeatures features;
         
 
         // Start with global jet features
@@ -816,9 +816,9 @@ XTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void XTagInfoProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void JetChargeTagInfoProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 }
-void XTagInfoProducer::endStream() {};
+void JetChargeTagInfoProducer::endStream() {};
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(XTagInfoProducer);
+DEFINE_FWK_MODULE(JetChargeTagInfoProducer);

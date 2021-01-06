@@ -1,5 +1,5 @@
-#ifndef ChargeReco_DataFormats_LLPLabelInfo_h
-#define ChargeReco_DataFormats_LLPLabelInfo_h
+#ifndef ChargeReco_DataFormats_JetChargeLabelInfo_h
+#define ChargeReco_DataFormats_JetChargeLabelInfo_h
 
 #include "ChargeReco/DataFormats/interface/JetChargeLabel.h"
 #include "DataFormats/BTauReco/interface/FeaturesTagInfo.h"

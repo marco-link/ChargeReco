@@ -72,7 +72,7 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         const pat::Jet& jet = jetCollection->at(ijet);
         edm::RefToBase<reco::Jet> jet_ref(jetCollection->refAt(ijet));
         wbwbx::JetChargeLabel label;
-        
+        /*
         if (not jet.genJet())
         {
             label.type = wbwbx::JetChargeLabel::Type::isUndefined;
@@ -96,7 +96,7 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
             }
             
         }
-
+        */
         outputJetChargeLabelInfo->emplace_back(label,jet_ref);
     }
 

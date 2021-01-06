@@ -1,19 +1,19 @@
 #include "DataFormats/Common/interface/Wrapper.h"
-#include "ChargeReco/DataFormats/interface/XTagFeatures.h"
-#include "ChargeReco/DataFormats/interface/XTagInfo.h"
+#include "ChargeReco/DataFormats/interface/JetChargeTagFeatures.h"
+#include "ChargeReco/DataFormats/interface/JetChargeTagInfo.h"
 #include "ChargeReco/DataFormats/interface/JetChargeLabel.h"
 
 namespace {
 
     struct dictionary
     {
-        std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>> dummy0;
-        edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::XTagFeatures>>> dummy1;
+        std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>> dummy0;
+        edm::Wrapper<std::vector<reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>>> dummy1;
 
-        reco::FeaturesTagInfo<wbwbx::XTagFeatures> dummy2;
-        edm::Wrapper<reco::FeaturesTagInfo<wbwbx::XTagFeatures>> dummy3;
+        reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures> dummy2;
+        edm::Wrapper<reco::FeaturesTagInfo<wbwbx::JetChargeTagFeatures>> dummy3;
 
-        wbwbx::XTagFeatures dummy4;
+        wbwbx::JetChargeTagFeatures dummy4;
         wbwbx::JetFeatures dummy5;
         wbwbx::SecondaryVertexFeatures dummy6;
         wbwbx::ChargedCandidateFeatures dummy7;

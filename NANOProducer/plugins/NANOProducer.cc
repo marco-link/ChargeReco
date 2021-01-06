@@ -11,7 +11,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/StreamID.h"
 
-#include "ChargeReco/DataFormats/interface/XTagInfo.h"
+#include "ChargeReco/DataFormats/interface/JetChargeTagInfo.h"
 
 #include "DataFormats/NanoAOD/interface/FlatTable.h"
 #include <Math/Vector4D.h>
@@ -39,7 +39,7 @@ class NANOProducer : public edm::stream::EDProducer<> {
 
     private:
         const edm::EDGetTokenT<edm::View<pat::Jet>> _jet_src;
-        const edm::EDGetTokenT<std::vector<reco::XTagInfo>> _tag_src;
+        const edm::EDGetTokenT<std::vector<reco::JetChargeTagInfo>> _tag_src;
         virtual void beginStream(edm::StreamID) override;
         virtual void produce(edm::Event&, const edm::EventSetup&) override;
         virtual void endStream() override;
@@ -47,7 +47,7 @@ class NANOProducer : public edm::stream::EDProducer<> {
 
 NANOProducer::NANOProducer(const edm::ParameterSet& iConfig) :
     _jet_src(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("srcJets"))),
-    _tag_src(consumes<std::vector<reco::XTagInfo>>(iConfig.getParameter<edm::InputTag>("srcTags")))
+    _tag_src(consumes<std::vector<reco::JetChargeTagInfo>>(iConfig.getParameter<edm::InputTag>("srcTags")))
 {
     globalProperties = {
         PROPERTY(wbwbx::JetFeatures, pt, "doc"),
@@ -381,7 +381,7 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     using namespace edm;
     edm::Handle<edm::View<pat::Jet>> jets;
     iEvent.getByToken(_jet_src, jets);
-    edm::Handle<std::vector<reco::XTagInfo>> tag_infos;
+    edm::Handle<std::vector<reco::JetChargeTagInfo>> tag_infos;
     iEvent.getByToken(_tag_src, tag_infos);
 
     unsigned int ntags = tag_infos->size();
@@ -398,9 +398,14 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::vector<int> cpf_length;
     std::vector<int> npf_length;
     std::vector<int> sv_length;
-
     std::vector<int> elec_length;
     std::vector<int> mu_length;
+    
+    std::vector<int> cpf_offset;
+    std::vector<int> npf_offset;
+    std::vector<int> sv_offset;
+    std::vector<int> elec_offset;
+    std::vector<int> mu_offset;
 
     auto globalTable = std::make_unique<nanoaod::FlatTable>(ntags, "global", false, false);
     auto csvTable = std::make_unique<nanoaod::FlatTable>(ntags, "csv", false, false);
@@ -416,27 +421,34 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     FlatTableFillerList<wbwbx::MuonCandidateFeatures> muonFillerList(muonProperties);
     FlatTableFillerList<wbwbx::ElectronCandidateFeatures> electronFillerList(electronProperties);
 
-    unsigned int nmu_total = 0;
-    unsigned int nelec_total = 0;
+    
     unsigned int ncpf_total = 0;
     unsigned int nnpf_total = 0;
     unsigned int nsv_total = 0;
+    unsigned int nmu_total = 0;
+    unsigned int nelec_total = 0;
 
     for (unsigned int itag= 0; itag < ntags; itag++){
         const auto& features = tag_infos->at(itag).features();
-
-        unsigned int nmu = features.mu_features.size();
-        unsigned int nelec = features.elec_features.size();
+        
         unsigned int ncpf = features.cpf_features.size();
         unsigned int nnpf = features.npf_features.size();
         unsigned int nsv = features.sv_features.size();
+        unsigned int nmu = features.mu_features.size();
+        unsigned int nelec = features.elec_features.size();
     
-        nmu_total += nmu;
-        nelec_total += nelec;
+        cpf_offset.push_back(ncpf_total);
+        npf_offset.push_back(nnpf_total);
+        sv_offset.push_back(nsv_total);
+        mu_offset.push_back(nmu_total);
+        elec_offset.push_back(nelec_total);
+
         ncpf_total += ncpf;
         nnpf_total += nnpf;
         nsv_total += nsv;
-
+        nmu_total += nmu;
+        nelec_total += nelec;
+        
         cpf_length.push_back(ncpf);
         npf_length.push_back(nnpf);
         sv_length.push_back(nsv);
@@ -519,11 +531,17 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
  
-    lengthTable->addColumn<int>("cpf", cpf_length, "charged PF candidate track offset", nanoaod::FlatTable::IntColumn);
-    lengthTable->addColumn<int>("npf", npf_length, "neutral PF candidate offset", nanoaod::FlatTable::IntColumn);
-    lengthTable->addColumn<int>("sv", sv_length, "secondary vertex (SV) offset", nanoaod::FlatTable::IntColumn);
-    lengthTable->addColumn<int>("mu", mu_length, "muon offset", nanoaod::FlatTable::IntColumn);
-    lengthTable->addColumn<int>("ele", elec_length, "electron offset", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("cpf", cpf_length, "charged PF candidate track length", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("npf", npf_length, "neutral PF candidate length", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("sv", sv_length, "secondary vertex (SV) length", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("mu", mu_length, "muon length", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("ele", elec_length, "electron length", nanoaod::FlatTable::IntColumn);
+    
+    lengthTable->addColumn<int>("cpf_offset", cpf_offset, "charged PF candidate track offset", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("npf_offset", npf_offset, "neutral PF candidate offset", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("sv_offset", sv_offset, "secondary vertex (SV) offset", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("mu_offset", mu_offset, "muon offset", nanoaod::FlatTable::IntColumn);
+    lengthTable->addColumn<int>("ele_offset", elec_offset, "electron offset", nanoaod::FlatTable::IntColumn);
     
     
     globalTable->addColumn<int>("jetIdx", global_jetIdx, "linked jet Idx", nanoaod::FlatTable::IntColumn);

@@ -22,8 +22,8 @@ cmsRun ChargeReco/NANOProducer/test/produceNANO.py
 
 ## Brief package overview
 
-* **DataFormats**: Contains classes for all persistent information, input features (XTagFeatures) and labels (JetChargeLabel), to be saved inside edm::Event.
+* **DataFormats**: Contains classes for all persistent information, input features (JetChargeTagFeatures) and labels (JetChargeLabel), to be saved inside edm::Event.
 * **NANOProducer**: Producers to create additional FlatTables to be stored inside flat nanoAOD format
-* **XTagInfoProducer**: Producers to extract relevant jet features
+* **JetChargeInfoProducer**: Producers to extract relevant jet features and labels
 
 
