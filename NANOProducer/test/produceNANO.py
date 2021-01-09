@@ -68,7 +68,7 @@ else:
     dataTier = cms.untracked.string('NANOAODSIM')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 process.options = cms.untracked.PSet()
@@ -114,7 +114,9 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         filterName = cms.untracked.string('')
     ),
     SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('wbwbxnanoAOD_step') #only events passing this path will be saved
+        SelectEvents = cms.vstring(
+            ['wbwbxnanoAOD_step_mu','wbwbxnanoAOD_step_ele'] if options.isData else ['wbwbxnanoAOD_step']
+        ) #only events passing this path will be saved
     ),
     fileName = cms.untracked.string('nano.root'),
     #outputCommands = process.NANOAODSIMEventContent.outputCommands+cms.untracked.vstring(
@@ -146,13 +148,14 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         #'drop *_rivetMetTable_*_*',
     )
 )
-
+'''
 ## Output file
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
 process.OUT = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('test.root'),
     outputCommands = cms.untracked.vstring(['keep *'])
 )
+'''
 
 if options.year == "test":
     options.year = "2016"
@@ -180,6 +183,8 @@ else:
 from PhysicsTools.NanoAOD.common_cff import *
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 
+
+#produces ShallowTagInfo pfDeepCSVTagInfosXTag
 updateJetCollection(
     process,
     labelName = "XTag",
@@ -187,7 +192,6 @@ updateJetCollection(
     jetCorrections = jetCorrectionsAK4PFchs,
     pfCandidates = cms.InputTag('packedPFCandidates'),
     pvSource = cms.InputTag("offlineSlimmedPrimaryVertices"),
-    #svSource = cms.InputTag('adaptedSlimmedSecondaryVertices'), 
     svSource = cms.InputTag('slimmedSecondaryVertices'),
     muSource = cms.InputTag('slimmedMuons'),
     elSource = cms.InputTag('slimmedElectrons'),
@@ -200,19 +204,18 @@ updateJetCollection(
     explicitJTA = False,
 )
 
-process.pfXTagInfos = cms.EDProducer("XTagInfoProducer",
+process.jetChargeTagInfos = cms.EDProducer("JetChargeTagInfoProducer",
     jets = cms.InputTag("updatedJets"),
     muonSrc  = cms.InputTag("slimmedMuons"),
     electronSrc = cms.InputTag("slimmedElectrons"),
     shallow_tag_infos = cms.InputTag('pfDeepCSVTagInfosXTag'),
     vertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    #secondary_vertices = cms.InputTag("adaptedSlimmedSecondaryVertices")
     secondary_vertices = cms.InputTag("slimmedSecondaryVertices")
 )
 
 process.nanoTable = cms.EDProducer("NANOProducer",
     srcJets = cms.InputTag("finalJets"),
-    srcTags = cms.InputTag("pfXTagInfos"),
+    srcTags = cms.InputTag("jetChargeTagInfos"),
 )
 
 process.nanoGenTable = cms.EDProducer("NANOGenProducer",
@@ -220,10 +223,30 @@ process.nanoGenTable = cms.EDProducer("NANOGenProducer",
     srcLabels = cms.InputTag("jetChargeLabels")
 )
 
+#redo ghost clustering since linked gen particles have been discarded
+process.patJetPartons = cms.EDProducer('HadronAndPartonSelector',
+     src = cms.InputTag("generator"),
+     particles = cms.InputTag("prunedGenParticles"),
+     partonMode = cms.string("Auto"),
+     fullChainPhysPartons = cms.bool(True)
+)
+process.jetFlavourAssociation = cms.EDProducer("JetFlavourClustering",
+     jets = cms.InputTag("updatedJets"),
+     bHadrons = cms.InputTag("patJetPartons","bHadrons"),
+     cHadrons = cms.InputTag("patJetPartons","cHadrons"),
+     partons = cms.InputTag("patJetPartons","physicsPartons"),
+     leptons = cms.InputTag("patJetPartons","leptons"),
+     jetAlgorithm = cms.string("AntiKt"),
+     rParam = cms.double(0.4),
+     ghostRescaling = cms.double(1e-18),
+     relPtTolerance = cms.double(9999999999), #supress warning since jets are corrected; thus pt match fails
+     hadronFlavourHasPriority = cms.bool(False)
+)
 
 process.jetChargeLabels = cms.EDProducer(
     "JetChargeLabelProducer",
-    srcJets = cms.InputTag("updatedJets")
+    srcJets = cms.InputTag("updatedJets"), #need to be same input as for 'jetFlavourAssociation'
+    customFlavourAssociation = cms.InputTag("jetFlavourAssociation")
 )
 
 
@@ -281,16 +304,51 @@ else:
 
 
 if options.isData:
-    process.wbwbxnanoAOD_step = cms.Path(
+    process.selectedMuonsForFilter = cms.EDFilter("CandViewSelector",
+        src = cms.InputTag("slimmedMuons"),
+        cut = cms.string("pt>25 && isGlobalMuon()")
+    )
+    process.selectedMuonsMinFilter = cms.EDFilter("CandViewCountFilter",
+        src = cms.InputTag("selectedMuonsForFilter"),
+        minNumber = cms.uint32(1)
+    )
+        
+    process.muonFilterSequence = cms.Sequence(
+        process.selectedMuonsForFilter+process.selectedMuonsMinFilter
+    )
+
+
+    process.selectedElectronsForFilter = cms.EDFilter("CandViewSelector",
+        src = cms.InputTag("slimmedElectrons"),
+        cut = cms.string("pt>25")
+    )
+    process.selectedElectronsMinFilter = cms.EDFilter("CandViewCountFilter",
+        src = cms.InputTag("selectedElectronsForFilter"),
+        minNumber = cms.uint32(1)
+    )
+        
+    process.electronFilterSequence = cms.Sequence(
+        process.selectedElectronsForFilter+process.selectedElectronsMinFilter
+    )
+
+    process.wbwbxnanoAOD_step_mu = cms.Path(
         process.muonFilterSequence+
         process.nanoSequence+
-        process.pfXTagInfos+
+        process.jetChargeTagInfos+
+        process.nanoTable
+    )
+    process.wbwbxnanoAOD_step_ele = cms.Path(
+        process.electronFilterSequence+
+        process.nanoSequence+
+        process.jetChargeTagInfos+
         process.nanoTable
     )
 else:
     process.wbwbxnanoAOD_step = cms.Path(
         process.nanoSequenceMC+
-        process.pfXTagInfos+
+        process.patJetPartons+
+        process.jetFlavourAssociation+
+        process.jetChargeTagInfos+
         process.jetChargeLabels+
         process.nanoTable+
         process.nanoGenTable
@@ -304,7 +362,12 @@ process.NANOAODSIMoutput_step = cms.EndPath(process.NANOAODSIMoutput)
 
 
 
-process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOAODSIMoutput_step)
+
+if options.isData:
+    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step_mu,process.wbwbxnanoAOD_step_ele,process.endjob_step,process.NANOAODSIMoutput_step)
+else:
+    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOAODSIMoutput_step)
+    
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
@@ -360,13 +423,6 @@ for moduleName in modulesToRemove:
 #process.finalPhotons.cut = cms.string("pt > 5")
 #process.finalPhotons.src = cms.InputTag("slimmedPhotons")
 
-'''
-process.MINIAODoutput = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('output.root'),
-    outputCommands = process.NANOAODSIMoutput.outputCommands,
-    dropMetaData = cms.untracked.string('ALL'),
-)
-'''
     
 process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))
 # Add early deletion of temporary data products to reduce peak memory need
