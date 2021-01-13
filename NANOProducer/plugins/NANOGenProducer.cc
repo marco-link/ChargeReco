@@ -73,14 +73,17 @@ NANOGenProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     std::vector<int> truth_jetIdx;
     
+    std::vector<int> bHadronId;
+    std::vector<int> cHadronId;
     
-    std::array<std::vector<int>,wbwbx::JetChargeLabel::BHadronTypes.size()> bhadronType;
+    std::array<std::vector<int>,wbwbx::JetChargeLabel::HadronDecays.size()> bHadronDecay;
+    std::array<std::vector<int>,wbwbx::JetChargeLabel::HadronDecays.size()> cHadronDecay;
     
-    std::array<std::vector<int>,wbwbx::JetChargeLabel::HadronDecays.size()> bhadronDecay;
-    std::array<std::vector<int>,wbwbx::JetChargeLabel::HadronDecays.size()> chadronDecay;
-    std::array<std::vector<int>,wbwbx::JetChargeLabel::HadronDecays.size()> dhadronDecay;
+    std::vector<int> nBHadrons;
+    std::vector<int> nCHadrons;
     
     std::vector<int> bHadronCharge;
+    std::vector<int> cHadronCharge;
     std::vector<int> bPartonCharge;
     
     std::vector<int> partonFlavor;
@@ -91,6 +94,9 @@ NANOGenProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         
     std::vector<float> matchedBHadronDeltaR;
     std::vector<float> matchedBHadronPt;
+    
+    std::vector<float> matchedCHadronDeltaR;
+    std::vector<float> matchedCHadronPt;
     
             
     for (std::size_t itag = 0; itag < ntruth; itag++) {
@@ -111,33 +117,65 @@ NANOGenProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         truth_jetIdx.push_back(jetIdx);
         
-        for (size_t i = 0; i < wbwbx::JetChargeLabel::BHadronTypes.size(); ++i)
-        {
-            bhadronType[i].push_back(labels.bhadronType == wbwbx::JetChargeLabel::BHadronTypes[i] ? 1 : 0);
-        }
+        bHadronId.push_back(labels.bHadronId);
+        cHadronId.push_back(labels.cHadronId);
+        
+        nBHadrons.push_back(labels.nBHadrons);
+        nCHadrons.push_back(labels.nCHadrons);
+        
+        bHadronCharge.push_back(labels.bHadronCharge);
+        cHadronCharge.push_back(labels.cHadronCharge);
+        bPartonCharge.push_back(labels.bPartonCharge);
+        
+        partonFlavor.push_back(labels.partonFlavor);
+        hadronFlavor.push_back(labels.hadronFlavor);
+        
+        matchedGenJetDeltaR.push_back(labels.matchedGenJetDeltaR);
+        matchedGenJetPt.push_back(labels.matchedGenJetPt);
+        
+        matchedBHadronDeltaR.push_back(labels.matchedBHadronDeltaR);
+        matchedBHadronPt.push_back(labels.matchedBHadronPt);
+        
+        matchedCHadronDeltaR.push_back(labels.matchedCHadronDeltaR);
+        matchedCHadronPt.push_back(labels.matchedCHadronPt);
         
         for (size_t i = 0; i < wbwbx::JetChargeLabel::HadronDecays.size(); ++i)
         {
-            bhadronDecay[i].push_back(labels.bhadronDecay == wbwbx::JetChargeLabel::HadronDecays[i] ? 1 : 0);
-            chadronDecay[i].push_back(labels.chadronDecay == wbwbx::JetChargeLabel::HadronDecays[i] ? 1 : 0);
-            dhadronDecay[i].push_back(labels.dhadronDecay == wbwbx::JetChargeLabel::HadronDecays[i] ? 1 : 0);
+            bHadronDecay[i].push_back(labels.bHadronDecay == wbwbx::JetChargeLabel::HadronDecays[i] ? 1 : 0);
+            cHadronDecay[i].push_back(labels.cHadronDecay == wbwbx::JetChargeLabel::HadronDecays[i] ? 1 : 0);
         }
- 
     }
 
     
     jetOriginTable->addColumn<int>("jetIdx", truth_jetIdx, "doc", nanoaod::FlatTable::IntColumn);
     
-    for (size_t i = 0; i < wbwbx::JetChargeLabel::BHadronTypes.size(); ++i)
-    {
-        jetOriginTable->addColumn<int>("BHadronType_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::BHadronTypes[i]), bhadronType[i], "doc", nanoaod::FlatTable::IntColumn);
-    }
+    jetOriginTable->addColumn<int>("bHadronId", bHadronId, "doc", nanoaod::FlatTable::IntColumn);
+    jetOriginTable->addColumn<int>("cHadronId", cHadronId, "doc", nanoaod::FlatTable::IntColumn);
+    
+    jetOriginTable->addColumn<int>("nBHadrons", nBHadrons, "doc", nanoaod::FlatTable::IntColumn);
+    jetOriginTable->addColumn<int>("nCHadrons", nCHadrons, "doc", nanoaod::FlatTable::IntColumn);
+    
+    jetOriginTable->addColumn<int>("bHadronCharge", bHadronCharge, "doc", nanoaod::FlatTable::IntColumn);
+    jetOriginTable->addColumn<int>("cHadronCharge", cHadronCharge, "doc", nanoaod::FlatTable::IntColumn);
+    jetOriginTable->addColumn<int>("bPartonCharge", bPartonCharge, "doc", nanoaod::FlatTable::IntColumn);
+    
+    jetOriginTable->addColumn<int>("partonFlavor", partonFlavor, "doc", nanoaod::FlatTable::IntColumn);
+    jetOriginTable->addColumn<int>("hadronFlavor", hadronFlavor, "doc", nanoaod::FlatTable::IntColumn);
+    
+    jetOriginTable->addColumn<float>("matchedGenJetDeltaR", matchedGenJetDeltaR, "doc", nanoaod::FlatTable::FloatColumn);
+    jetOriginTable->addColumn<float>("matchedGenJetPt", matchedGenJetPt, "doc", nanoaod::FlatTable::FloatColumn);
+    
+    jetOriginTable->addColumn<float>("matchedBHadronDeltaR", matchedBHadronDeltaR, "doc", nanoaod::FlatTable::FloatColumn);
+    jetOriginTable->addColumn<float>("matchedBHadronPt", matchedBHadronPt, "doc", nanoaod::FlatTable::FloatColumn);
+
+    jetOriginTable->addColumn<float>("matchedCHadronDeltaR", matchedCHadronDeltaR, "doc", nanoaod::FlatTable::FloatColumn);
+    jetOriginTable->addColumn<float>("matchedCHadronPt", matchedCHadronPt, "doc", nanoaod::FlatTable::FloatColumn);
+
     
     for (size_t i = 0; i < wbwbx::JetChargeLabel::HadronDecays.size(); ++i)
     {
-        jetOriginTable->addColumn<int>("BHadronDecay_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::HadronDecays[i]), bhadronDecay[i], "doc", nanoaod::FlatTable::IntColumn);
-        jetOriginTable->addColumn<int>("CHadronDecay_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::HadronDecays[i]), chadronDecay[i], "doc", nanoaod::FlatTable::IntColumn);
-        jetOriginTable->addColumn<int>("DHadronDecay_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::HadronDecays[i]), dhadronDecay[i], "doc", nanoaod::FlatTable::IntColumn);
+        jetOriginTable->addColumn<int>("bHadronDecay_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::HadronDecays[i]), bHadronDecay[i], "doc", nanoaod::FlatTable::IntColumn);
+        jetOriginTable->addColumn<int>("cHadronDecay_"+wbwbx::JetChargeLabel::typeToString(wbwbx::JetChargeLabel::HadronDecays[i]), cHadronDecay[i], "doc", nanoaod::FlatTable::IntColumn);
     }
          
     iEvent.put(std::move(jetOriginTable), "jetorigin");

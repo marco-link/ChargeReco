@@ -37,6 +37,21 @@ class JetChargeLabelProducer:
         edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> jetFlavourInfoMatchingToken_;
 
         virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup) override;
+        
+        static int getHadronFlavor(int absPdgId)
+        {
+            if (absPdgId<100)
+            {
+                if (absPdgId<6) return absPdgId; //parton
+                return 0; //not a hadron
+            }
+            int nq3 = (absPdgId/     10)%10; //quark content
+            int nq2 = (absPdgId/    100)%10; //quark content
+            int nq1 = (absPdgId/   1000)%10; //quark content
+            int nL  = (absPdgId/  10000)%10;
+            int n   = (absPdgId/1000000)%10;
+            return std::max({nq1,nq2,nq3})+n*10000+(n>0 and nL==9)*100;
+        }
 
     public:
         explicit JetChargeLabelProducer(const edm::ParameterSet&);
@@ -71,8 +86,6 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<reco::JetFlavourInfoMatchingCollection> jetFlavourInfoMatchingCollection;
     iEvent.getByToken(jetFlavourInfoMatchingToken_, jetFlavourInfoMatchingCollection);
     
-    std::cout<<jetCollection->size()<<", "<<jetFlavourInfoMatchingCollection->size()<<std::endl;
-    
     auto outputJetChargeLabelInfo = std::make_unique<reco::JetChargeLabelInfoCollection>();
     
     for (std::size_t ijet = 0; ijet < jetCollection->size(); ijet++) 
@@ -83,35 +96,99 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         
         if (jet.genJet())
         {
-
             label.partonFlavor = jet.partonFlavour();
-            if (label.partonFlavor==5) label.bPartonCharge = -1; //b = -1/3
-            if (label.partonFlavor==-5) label.bPartonCharge = 1; //bbar = +1/3
-            
             label.hadronFlavor = jet.hadronFlavour();
-            
-            const reco::JetFlavourInfo& flavourInfo = (*jetFlavourInfoMatchingCollection)[jet_ref];
-            
-            for (const auto& bhadron: flavourInfo.getbHadrons())
-            {
-                std::cout<<bhadron->pt()<<std::endl;
-            }
             
             label.matchedGenJetDeltaR = reco::deltaR(jet.p4(),jet.genJet()->p4());
             label.matchedGenJetPt = jet.genJet()->pt();
             
-            /*
-            if (std::abs(jet.partonFlavour())==5)
-            {
-                label.type = jet.partonFlavour()>0 ? wbwbx::JetChargeLabel::Type::isB_pos : wbwbx::JetChargeLabel::Type::isB_neg;
-            }
-  
-            else
-            {
-                label.type = wbwbx::JetChargeLabel::Type::isUndefined;
-            }*/
+            if (label.partonFlavor==5) label.bPartonCharge = -1; //b = -1/3
+            if (label.partonFlavor==-5) label.bPartonCharge = 1; //bbar = +1/3
             
+            const reco::JetFlavourInfo& flavourInfo = (*jetFlavourInfoMatchingCollection)[jet_ref];
+            
+            label.nBHadrons = flavourInfo.getbHadrons().size();
+            label.nCHadrons = flavourInfo.getcHadrons().size();
+            
+            const reco::GenParticle* leadingBHadron(nullptr);
+            for (const auto& bhadron: flavourInfo.getbHadrons())
+            {
+                if (not leadingBHadron or leadingBHadron->pt()<bhadron->pt()) leadingBHadron = bhadron.get();
+            }
+            
+            const reco::GenParticle* leadingCHadron(nullptr);
+            for (const auto& chadron: flavourInfo.getcHadrons())
+            {
+                if (not leadingCHadron or leadingCHadron->pt()<chadron->pt()) leadingCHadron = chadron.get();
+            }
+            
+            if (leadingBHadron)
+            {
+                label.bHadronId = leadingBHadron->pdgId();
+                label.bHadronCharge = leadingBHadron->charge();
+                
+                label.matchedBHadronDeltaR = reco::deltaR(leadingBHadron->p4(),jet.genJet()->p4());
+                label.matchedBHadronPt = leadingBHadron->pt();
+
+                int nC = 0;
+                label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Undefined;
+                std::cout<<"b: "<<leadingBHadron->pdgId()<<": ";
+                for (const auto& daughter: leadingBHadron->daughterRefVector())
+                {
+                    std::cout<<daughter->pdgId()<<", ";
+                    int absDaughterId = std::abs(daughter->pdgId());
+                    if (absDaughterId==11) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Electron;
+                    if (absDaughterId==13) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Muon;
+                    if (absDaughterId==15) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Tau;
+                    if (getHadronFlavor(absDaughterId)==4)
+                    {
+                        nC+=1;
+                    }
+                }
+                std::cout<<" = "<<nC<<std::endl;
+                if (label.bHadronDecay == wbwbx::JetChargeLabel::HadronDecay::Undefined)
+                {
+                    if (nC>1) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::DiHadronic;
+                    else label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Hadronic;
+                }
+            }
+        
+        
+            if (leadingCHadron)
+            {
+                label.cHadronId = leadingCHadron->pdgId();
+                label.cHadronCharge = leadingCHadron->charge();
+                
+                label.matchedCHadronDeltaR = reco::deltaR(leadingCHadron->p4(),jet.genJet()->p4());
+                label.matchedCHadronPt = leadingCHadron->pt();
+                
+                int nS = 0;
+                label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Undefined;
+                
+                std::cout<<"c: "<<leadingCHadron->pdgId()<<": ";
+                for (const auto& daughter: leadingCHadron->daughterRefVector())
+                {
+                    std::cout<<daughter->pdgId()<<", ";
+                    int absDaughterId = std::abs(daughter->pdgId());
+                    if (absDaughterId==11) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Electron;
+                    if (absDaughterId==13) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Muon;
+                    if (absDaughterId==15) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Tau;
+                    if (getHadronFlavor(absDaughterId)==3)
+                    {
+                        nS+=1;
+                    }
+                }
+                std::cout<<" = "<<nS<<std::endl;
+                if (label.cHadronDecay == wbwbx::JetChargeLabel::HadronDecay::Undefined)
+                {
+                    if (nS>1) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::DiHadronic;
+                    else label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Hadronic;
+                }
+            }
+            
+            std::cout<<"bdecay = "<<wbwbx::JetChargeLabel::typeToString(label.bHadronDecay)<<", cdecay = "<<wbwbx::JetChargeLabel::typeToString(label.cHadronDecay)<<std::endl;
         }
+        
         
         outputJetChargeLabelInfo->emplace_back(label,jet_ref);
     }

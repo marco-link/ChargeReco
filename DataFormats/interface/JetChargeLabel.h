@@ -11,43 +11,34 @@ class JetChargeLabel {
         
         int jetIdx;
         
-        enum class BHadronType {
-            Bpm, //B+ or B-
-            B0,
-            Bs,
-            Bc,
-            Undefined //when no b hadron is found
-        };
-        constexpr static std::array<BHadronType,5> BHadronTypes{{
-            BHadronType::Bpm,
-            BHadronType::B0,
-            BHadronType::Bs,
-            BHadronType::Bc,
-            BHadronType::Undefined
-        }};
-        
         enum class HadronDecay {
             Electron,
             Muon,
             Tau,
-            Hadronic,
-            Undefined //when no b/c/d hadron is found
+            Hadronic, //b-> c X
+            DiHadronic, //b->cc X
+            Undefined //when no b/c hadron is found
         };
-        constexpr static std::array<HadronDecay,5> HadronDecays{{
+        constexpr static std::array<HadronDecay,6> HadronDecays{{
             HadronDecay::Electron,
             HadronDecay::Muon,
             HadronDecay::Tau,
             HadronDecay::Hadronic,
+            HadronDecay::DiHadronic,
             HadronDecay::Undefined
         }};
         
-        BHadronType bhadronType;
+        int bHadronId;
+        int cHadronId;
         
-        HadronDecay bhadronDecay;
-        HadronDecay chadronDecay;
-        HadronDecay dhadronDecay;
+        HadronDecay bHadronDecay;
+        HadronDecay cHadronDecay;
+        
+        int nBHadrons;
+        int nCHadrons;
         
         int bHadronCharge; //charge of b quark in hadron (particle level); can differ due to oscillations
+        int cHadronCharge;
         int bPartonCharge; //parton-level b quark
         
         int partonFlavor; //generic parton flavour of jet
@@ -59,34 +50,30 @@ class JetChargeLabel {
         float matchedBHadronDeltaR;
         float matchedBHadronPt;
         
+        float matchedCHadronDeltaR;
+        float matchedCHadronPt;
+        
         JetChargeLabel():
-            bhadronType(BHadronType::Undefined),
-            bhadronDecay(HadronDecay::Undefined),
-            chadronDecay(HadronDecay::Undefined),
-            dhadronDecay(HadronDecay::Undefined),
+            bHadronId(0),
+            cHadronId(0),
+            bHadronDecay(HadronDecay::Undefined),
+            cHadronDecay(HadronDecay::Undefined),
+            nBHadrons(0),
+            nCHadrons(0),
             bHadronCharge(0),
+            cHadronCharge(0),
             bPartonCharge(0),
             partonFlavor(0),
             hadronFlavor(0),
             matchedGenJetDeltaR(-1),
             matchedGenJetPt(-1),
             matchedBHadronDeltaR(-1),
-            matchedBHadronPt(-1)
+            matchedBHadronPt(-1),
+            matchedCHadronDeltaR(-1),
+            matchedCHadronPt(-1)
         {
         }
         
-        inline static std::string typeToString(const BHadronType& bHadronType)
-        {
-            switch (bHadronType)
-            {
-                case BHadronType::Bpm: return "Bpm";
-                case BHadronType::B0: return "B0";
-                case BHadronType::Bs: return "Bs";
-                case BHadronType::Bc: return "Bc";
-                case BHadronType::Undefined: return "Undefined";
-            }
-            return "Undefined";
-        }
         
         inline static std::string typeToString(const HadronDecay& hadronDecay)
         {
@@ -96,6 +83,7 @@ class JetChargeLabel {
                 case HadronDecay::Muon: return "Muon";
                 case HadronDecay::Tau: return "Tau";
                 case HadronDecay::Hadronic: return "Hadronic";
+                case HadronDecay::DiHadronic: return "DiHadronic";
                 case HadronDecay::Undefined: return "Undefined";
             }
             return "Undefined";
