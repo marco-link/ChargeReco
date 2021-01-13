@@ -132,10 +132,8 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
                 int nC = 0;
                 label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Undefined;
-                std::cout<<"b: "<<leadingBHadron->pdgId()<<": ";
                 for (const auto& daughter: leadingBHadron->daughterRefVector())
                 {
-                    std::cout<<daughter->pdgId()<<", ";
                     int absDaughterId = std::abs(daughter->pdgId());
                     if (absDaughterId==11) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Electron;
                     if (absDaughterId==13) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Muon;
@@ -145,11 +143,11 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                         nC+=1;
                     }
                 }
-                std::cout<<" = "<<nC<<std::endl;
                 if (label.bHadronDecay == wbwbx::JetChargeLabel::HadronDecay::Undefined)
                 {
                     if (nC>1) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::DiHadronic;
-                    else label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Hadronic;
+                    else if (nC == 1) label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::SingleHadronic;
+                    else label.bHadronDecay = wbwbx::JetChargeLabel::HadronDecay::OtherHadronic;
                 }
             }
         
@@ -165,10 +163,8 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 int nS = 0;
                 label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Undefined;
                 
-                std::cout<<"c: "<<leadingCHadron->pdgId()<<": ";
                 for (const auto& daughter: leadingCHadron->daughterRefVector())
                 {
-                    std::cout<<daughter->pdgId()<<", ";
                     int absDaughterId = std::abs(daughter->pdgId());
                     if (absDaughterId==11) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Electron;
                     if (absDaughterId==13) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Muon;
@@ -178,17 +174,14 @@ JetChargeLabelProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                         nS+=1;
                     }
                 }
-                std::cout<<" = "<<nS<<std::endl;
                 if (label.cHadronDecay == wbwbx::JetChargeLabel::HadronDecay::Undefined)
                 {
                     if (nS>1) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::DiHadronic;
-                    else label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::Hadronic;
+                    else if (nS == 1) label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::SingleHadronic;
+                    else label.cHadronDecay = wbwbx::JetChargeLabel::HadronDecay::OtherHadronic;
                 }
             }
-            
-            std::cout<<"bdecay = "<<wbwbx::JetChargeLabel::typeToString(label.bHadronDecay)<<", cdecay = "<<wbwbx::JetChargeLabel::typeToString(label.cHadronDecay)<<std::endl;
         }
-        
         
         outputJetChargeLabelInfo->emplace_back(label,jet_ref);
     }

@@ -15,16 +15,18 @@ class JetChargeLabel {
             Electron,
             Muon,
             Tau,
-            Hadronic, //b-> c X
-            DiHadronic, //b->cc X
-            Undefined //when no b/c hadron is found
+            SingleHadronic, //b-> cX or c-> sX
+            DiHadronic, //b->ccX or c-> ssX
+            OtherHadronic, //no c or no s
+            Undefined //when no b/c hadron is matched
         };
-        constexpr static std::array<HadronDecay,6> HadronDecays{{
+        constexpr static std::array<HadronDecay,7> HadronDecays{{
             HadronDecay::Electron,
             HadronDecay::Muon,
             HadronDecay::Tau,
-            HadronDecay::Hadronic,
+            HadronDecay::SingleHadronic,
             HadronDecay::DiHadronic,
+            HadronDecay::OtherHadronic,
             HadronDecay::Undefined
         }};
         
@@ -82,8 +84,9 @@ class JetChargeLabel {
                 case HadronDecay::Electron: return "Electron";
                 case HadronDecay::Muon: return "Muon";
                 case HadronDecay::Tau: return "Tau";
-                case HadronDecay::Hadronic: return "Hadronic";
+                case HadronDecay::SingleHadronic: return "SingleHadronic";
                 case HadronDecay::DiHadronic: return "DiHadronic";
+                case HadronDecay::OtherHadronic: return "OtherHadronic";
                 case HadronDecay::Undefined: return "Undefined";
             }
             return "Undefined";
