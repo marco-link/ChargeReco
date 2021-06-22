@@ -71,7 +71,9 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
 )
 
-process.options = cms.untracked.PSet()
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True)
+)
 
 #2016 dataset: /ST_4f_w_lo/mkomm-miniaod16v3_201024-53f8667ba4b240d5eafd36e71bf34742/USER
 
@@ -142,10 +144,9 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         'drop *_FatJetTable_*_*',
         'drop *_saTable_*_*',
         
-        'drop *_rivetMetTable_*_*',
+        #'drop *_rivetMetTable_*_*',
         'drop *_rivetProducerHTXS_*_*',
         
-        #'drop *_rivetMetTable_*_*',
     )
 )
 '''
@@ -330,15 +331,32 @@ if options.isData:
     process.electronFilterSequence = cms.Sequence(
         process.selectedElectronsForFilter+process.selectedElectronsMinFilter
     )
+    
+    
+    process.selecteJetsForFilter = cms.EDFilter("CandViewSelector",
+        src = cms.InputTag("slimmedJets"),
+        cut = cms.string("pt>25")
+    )
+    process.selectedJetsMinFilter = cms.EDFilter("CandViewCountFilter",
+        src = cms.InputTag("selecteJetsForFilter"),
+        minNumber = cms.uint32(2)
+    )
+    
+    process.jetsFilterSequence = cms.Sequence(
+        process.selecteJetsForFilter+process.selectedJetsMinFilter
+    )
+    
 
     process.wbwbxnanoAOD_step_mu = cms.Path(
         process.muonFilterSequence+
+        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable
     )
     process.wbwbxnanoAOD_step_ele = cms.Path(
         process.electronFilterSequence+
+        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable
@@ -389,7 +407,6 @@ modulesToRemove = [
     'subJetTable',
     'saJetTable',
     'saTable',
-
 
     "genJetAK8Table",
     "genJetAK8FlavourAssociation",
