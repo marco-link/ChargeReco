@@ -4,12 +4,13 @@
 
 ## Checkout instructions
 
-Using recent CMSSW release which is shipped with all the required software (especially tensorflow C++ v1.6).
+Using recent CMSSW release which corresponds to recommended NanoAODv8 (labelled 'NanoAODv2' in DAS). See [PPD](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis).
 ```
-cmsrel CMSSW_10_2_18
-cd CMSSW_10_2_18/src
+export SCRAM_ARCH=slc7_amd64_gcc700
+cmsrel CMSSW_10_6_19_patch2
+cd CMSSW_10_6_19_patch2/src
 cmsenv
-git clone https://github.com/WbWbX/ChargeReco.git ChargeReco
+git clone https://github.com/WbWbX/ChargeReco.git -b UL ChargeReco
 scram b
 ```
 
