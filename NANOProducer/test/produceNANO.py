@@ -1,9 +1,11 @@
+# Auto generated configuration file
+# using: 
+# Revision: 1.19 
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
+# with command line options: --python_filename produceNano2016UL_cfg.py --eventcontent NANOEDMAODSIM --datatier NANOAODSIM --fileout file:nanox2016.root --conditions 106X_mcRun2_asymptotic_v17 --step NANO --filein /store/mc/RunIISummer20UL16MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_v13-v2/260000/8673D920-D951-E648-A9BE-5F177802CD5B.root --era Run2_2016,run2_nanoAOD_106Xv1 --no_exec --mc -n 100
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
-#from PhysicsTools.NanoAOD.common_cff import *
 from Configuration.StandardSequences.Eras import eras
-from RecoBTag.Configuration.RecoBTag_cff import *
-from Configuration.AlCa.GlobalTag import GlobalTag
 
 
 options = VarParsing ('analysis')
@@ -33,37 +35,37 @@ options.register(
 )
 options.parseArguments() 
 
-if options.year == '2016':
-    process = cms.Process('NANO',eras.Run2_2016,eras.run2_nanoAOD_94X2016)
-elif options.year == '2017':
-    process = cms.Process('NANO',eras.Run2_2017,eras.run2_nanoAOD_94XMiniAODv2)
-elif options.year == '2018' or options.year == '2018D':
-    process = cms.Process('NANO',eras.Run2_2018,eras.run2_nanoAOD_102Xv1)
-else:
-    process = cms.Process('NANO',eras.Run2_2016,eras.run2_nanoAOD_94X2016)
+print "Year:", options.year
+print "isData:", options.isData
 
-print "Selected year: ",options.year
+
+if options.year not in ['2016','2016preVFP','2017','2018']:
+    raise Exception('Year options needs to be one of the following: '+str(['2016','2016preVFP','2017','2018']))
+
+if options.year=='2016' or options.year=='2016preVFP':
+    process = cms.Process('NANO',eras.Run2_2016,eras.run2_nanoAOD_106Xv1)
+elif options.year=='2017':
+    process = cms.Process('NANO',eras.Run2_2017,eras.run2_nanoAOD_106Xv1)
+elif options.year=='2018':
+    process = cms.Process('NANO',eras.Run2_2018,eras.run2_nanoAOD_106Xv1)
+
+
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.StandardSequences.EndOfProcess_cff')
-process.load('Configuration.EventContent.EventContent_cff')
-process.load('Configuration.Geometry.GeometryRecoDB_cff')
-process.load('PhysicsTools.NanoAOD.nano_cff')
-
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.load('FWCore.MessageLogger.MessageLogger_cfi')
-process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
-
+process.load('Configuration.EventContent.EventContent_cff')
+process.load('SimGeneral.MixingModule.mixNoPU_cfi')
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+process.load('PhysicsTools.NanoAOD.nano_cff')
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 if options.isData:
     process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
     dataTier = cms.untracked.string('NANOAOD')
 else:
-    process.load('SimGeneral.MixingModule.mixNoPU_cfi')
     process.load('Configuration.StandardSequences.MagneticField_cff')
     dataTier = cms.untracked.string('NANOAODSIM')
 
@@ -71,42 +73,52 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
 )
 
+inputFiles = {
+    '2016preVFP': {
+        'mc': ['/store/mc/RunIISummer20UL16MiniAODAPV/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v8-v1/270000/F8E1C8DC-C55C-0141-86A6-9BA6ED714733.root'],
+        'data': ['?']
+    },
+    '2016': {
+        'mc': ['/store/mc/RunIISummer20UL16MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_v13-v2/260000/8673D920-D951-E648-A9BE-5F177802CD5B.root'],
+        'data': ['?'],
+    },
+    '2017': {
+        'mc': ['/store/mc/RunIISummer19UL17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v2/260000/F27A3A53-2B4C-E846-B8E2-440CC8FCD255.root'],
+        'data': ['?'],
+    },
+    '2018': {
+        'mc': ['/store/mc/RunIISummer19UL18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/100000/0537A477-C32D-154E-9A17-A4792914E8B6.root'],
+        'data': ['?']
+    }
+}
+
+
+# Input source
+process.source = cms.Source("PoolSource",
+    fileNames = cms.untracked.vstring(),
+    secondaryFileNames = cms.untracked.vstring()
+)
+
+if options.isData:
+    process.source.fileNames = inputFiles[options.year]['data']
+else:
+    process.source.fileNames = inputFiles[options.year]['mc']
+
+
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
 )
 
-#2016 dataset: /ST_4f_w_lo/mkomm-miniaod16v3_201024-53f8667ba4b240d5eafd36e71bf34742/USER
-
-files = {
-    '2016': {
-        "mc": "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/ST/miniaod16v3_201024/ST_4f_w_lo/miniaod16v3_201024/201024_150323/0000/ST_1.root",
-        "data": "/store/data/Run2016H/SingleMuon/MINIAOD/17Jul2018-v1/00000/16924A85-4D8C-E811-A51C-A4BF01013F29.root",
-    },
-    '2017': {
-        "data": "/store/data/Run2017E/SingleMuon/MINIAOD/31Mar2018-v1/00000/A6325FCE-1C39-E811-BB22-0CC47A745298.root"
-    },
-    '2018': {
-        "data": "/store/data/Run2018B/SingleMuon/MINIAOD/17Sep2018-v1/60000/FF47BB90-FC1A-CC44-A635-2B8B8C64AA39.root"
-    },
-    '2018D': {
-        "data": "/store/data/Run2018B/SingleMuon/MINIAOD/17Sep2018-v1/60000/FF47BB90-FC1A-CC44-A635-2B8B8C64AA39.root"
-    }
-}
-
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(files[options.year]['data'] if options.isData else files[options.year]['mc'])
-
-)
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('test102X nevts:10000'),
+    annotation = cms.untracked.string('--python_filename nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
 
+# Output definition
 
-#Output definition
-process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
+process.NANOoutput = cms.OutputModule("NanoAODOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
     compressionLevel = cms.untracked.int32(9),
     saveProvenance = cms.untracked.bool(True),
@@ -120,72 +132,53 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
             ['wbwbxnanoAOD_step_mu','wbwbxnanoAOD_step_ele'] if options.isData else ['wbwbxnanoAOD_step']
         ) #only events passing this path will be saved
     ),
-    fileName = cms.untracked.string('nano.root'),
+    fileName = cms.untracked.string('nanox.root'),
     #outputCommands = process.NANOAODSIMEventContent.outputCommands+cms.untracked.vstring(
     outputCommands = cms.untracked.vstring(
-        'drop *',
-        'keep nanoaodFlatTable_*Table_*_*',
-        'keep edmTriggerResults_*_*_*',
-        'keep nanoaodMergeableCounterTable_*Table_*_*',
-        'keep nanoaodUniqueString_nanoMetadata_*_*',
-        
-        'drop *_caloMetTable_*_*',
-        
-        'drop *_fatJetTable_*_*',
-        'drop *_genJetAK8FlavourTable_*_*',
-        'drop *_genJetAK8Table_*_*',
-        'drop *_genVisTauTable_*_*',
-        'drop *_subJetTable_*_*',
-        'drop *_tkMetTable_*_*',
-        'drop *_puppiMetTable_*_*',
-        'drop *_ttbarCategoryTable_*_*',
-        
-        'drop *_saJetTable_*_*',
-        'drop *_FatJetTable_*_*',
-        'drop *_saTable_*_*',
-        
-        #'drop *_rivetMetTable_*_*',
-        'drop *_rivetProducerHTXS_*_*',
-        
+        'drop *', 
+        'keep nanoaodFlatTable_*Table_*_*', 
+        'keep edmTriggerResults_*_*_*', 
+        'keep String_*_genModel_*', 
+        'keep nanoaodMergeableCounterTable_*Table_*_*', 
+        'keep nanoaodUniqueString_nanoMetadata_*_*'
     )
 )
-'''
-## Output file
-from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
-process.OUT = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('test.root'),
-    outputCommands = cms.untracked.vstring(['keep *'])
-)
-'''
 
-if options.year == "test":
-    options.year = "2016"
+
+from Configuration.AlCa.GlobalTag import GlobalTag
+
+
+globalTags = {
+    '2016preVFP': {
+        'mc': '106X_mcRun2_asymptotic_preVFP_v11',
+        'data': '106X_dataRun2_v35'
+    },
+    '2016': {
+        'mc': '106X_mcRun2_asymptotic_v17',
+        'data': '106X_dataRun2_v35',
+    },
+    '2017': {
+        'mc': '106X_mc2017_realistic_v8',
+        'data': '106X_dataRun2_v35',
+    },
+    '2018': {
+        'mc': '106X_upgrade2018_realistic_v15_L1v1',
+        'data': '106X_dataRun2_v35'
+    }
+}
 
 if options.isData:
-    if options.year == '2016':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v12', '')
-    if options.year == '2017':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v12', '')
-    if options.year == '2018':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v12', '')
-    if options.year == '2018D':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v15', '')
+    process.GlobalTag = GlobalTag(process.GlobalTag, globalTags[options.year]['data'], '')
     jetCorrectionsAK4PFchs = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual'], 'None')
 else:
-    if options.year == '2016':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_mcRun2_asymptotic_v7', '')
-    if options.year == '2017':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_mc2017_realistic_v7', '')
-    if options.year == '2018' or options.year == '2018D':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v20', '')
+    process.GlobalTag = GlobalTag(process.GlobalTag, globalTags[options.year]['mc'], '')
     jetCorrectionsAK4PFchs = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-
+    
+    
 
 from PhysicsTools.NanoAOD.common_cff import *
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-
-
-#produces ShallowTagInfo pfDeepCSVTagInfosXTag
+    
 updateJetCollection(
     process,
     labelName = "XTag",
@@ -219,11 +212,6 @@ process.nanoTable = cms.EDProducer("NANOProducer",
     srcTags = cms.InputTag("jetChargeTagInfos"),
 )
 
-process.nanoGenTable = cms.EDProducer("NANOGenProducer",
-    srcJets = cms.InputTag("finalJets"),
-    srcLabels = cms.InputTag("jetChargeLabels")
-)
-
 #redo ghost clustering since linked gen particles have been discarded
 process.patJetPartons = cms.EDProducer('HadronAndPartonSelector',
      src = cms.InputTag("generator"),
@@ -249,8 +237,14 @@ process.jetChargeLabels = cms.EDProducer(
     srcJets = cms.InputTag("updatedJets"), #need to be same input as for 'jetFlavourAssociation'
     customFlavourAssociation = cms.InputTag("jetFlavourAssociation")
 )
+   
 
-
+process.nanoGenTable = cms.EDProducer("NANOGenProducer",
+    srcJets = cms.InputTag("finalJets"),
+    srcLabels = cms.InputTag("jetChargeLabels")
+)
+    
+  
 
 process.lheWeightsTable = cms.EDProducer(
     "LHEWeightsProducer",
@@ -290,20 +284,9 @@ for scaleSet in [
     setattr(process.lheWeightsTable.weightGroups,scaleSet[0],cms.vstring())
     for i in scaleSet[1]:
         getattr(process.lheWeightsTable.weightGroups,scaleSet[0]).append("%i"%(i))
-        
-
-
-# Automatic addition of the customisation function from PhysicsTools.NanoAOD.nano_cff
-from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeData,nanoAOD_customizeMC
-
-#call to customisation function nanoAOD_customizeMC imported from PhysicsTools.NanoAOD.nano_cff
-if options.isData:
-    process = nanoAOD_customizeData(process)
-else:
-    process = nanoAOD_customizeMC(process)
-    
-
-
+  
+  
+  
 if options.isData:
     process.selectedMuonsForFilter = cms.EDFilter("CandViewSelector",
         src = cms.InputTag("slimmedMuons"),
@@ -345,7 +328,6 @@ if options.isData:
     process.jetsFilterSequence = cms.Sequence(
         process.selecteJetsForFilter+process.selectedJetsMinFilter
     )
-    
 
     process.wbwbxnanoAOD_step_mu = cms.Path(
         process.muonFilterSequence+
@@ -361,6 +343,7 @@ if options.isData:
         process.jetChargeTagInfos+
         process.nanoTable
     )
+
 else:
     process.wbwbxnanoAOD_step = cms.Path(
         process.nanoSequenceMC+
@@ -374,58 +357,28 @@ else:
     
     if options.addSignalLHE:
         process.wbwbxnanoAOD_step += process.lheWeightsTable
-    
+  
+
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.NANOAODSIMoutput_step = cms.EndPath(process.NANOAODSIMoutput)
+process.NANOoutput_step = cms.EndPath(process.NANOoutput)
 
-
-
-
-if options.isData:
-    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step_mu,process.wbwbxnanoAOD_step_ele,process.endjob_step,process.NANOAODSIMoutput_step)
-else:
-    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOAODSIMoutput_step)
-    
+# Schedule definition
+process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 
-modulesToRemove = [
-    'jetCorrFactorsAK8',
-    'updatedJetsAK8',
-    'tightJetIdAK8',
-    'looseJetIdAK8',
-    'tightJetIdLepVetoAK8',
-    'updatedJetsAK8WithUserData',
-    'chsForSATkJets',
-    'softActivityJets',
-    'softActivityJets2',
-    'softActivityJets5',
-    'softActivityJets10',
-    'finalJetsAK8',
-    'fatJetTable',
-    'subJetTable',
-    'saJetTable',
-    'saTable',
+from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeMC 
+process = nanoAOD_customizeMC(process)
 
-    "genJetAK8Table",
-    "genJetAK8FlavourAssociation",
-    "genJetAK8FlavourTable",
-   
+
+#remove unneeded modules
+modulesToRemove = [
     "HTXSCategoryTable",
     "rivetProducerHTXS",
-    "genSubJetAK8Table",
-    
     "l1bits",
 ]
 
-#override final jets
-
-#process.finalJets.addBTagInfo=cms.bool(True)
-#process.finalJets.addDiscriminators = cms.bool(True)
-#process.finalJets.addTagInfos=cms.bool(True)
-
-#remove unneeded modules
 for moduleName in modulesToRemove:
     if hasattr(process,moduleName):
         print "removing module: ",moduleName
@@ -436,16 +389,9 @@ for moduleName in modulesToRemove:
     else:
         print "module for removal not found: ",moduleName
 
-#override final photons (required by object linker) so that ID evaluation is not needed
-#process.finalPhotons.cut = cms.string("pt > 5")
-#process.finalPhotons.src = cms.InputTag("slimmedPhotons")
 
-    
 process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))
-# Add early deletion of temporary data products to reduce peak memory need
+
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
-#print process.dumpPython()
-# End adding early deletion
 
-#process.endpath= cms.EndPath(process.OUT)
