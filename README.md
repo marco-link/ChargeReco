@@ -1,17 +1,20 @@
 # ChargeReco
-* Production of extended nanoAOD ntuples for analysis and training
+
+Production of extended nanoAOD ntuples for analysis and training of b jet charge classfier.
+
 
 ## Checkout instructions
 
-Using recent CMSSW release which corresponds to recommended NanoAODv8 (labelled 'NanoAODv2' in DAS). See [PPD](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis).
+Using recent CMSSW release which corresponds to recommended NanoAODv9. See [PPD](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis).
 ```
 export SCRAM_ARCH=slc7_amd64_gcc700
-cmsrel CMSSW_10_6_20
-cd CMSSW_10_6_20/src
+cmsrel CMSSW_10_6_27
+cd CMSSW_10_6_27/src
 cmsenv
 git clone https://github.com/WbWbX/ChargeReco.git -b UL ChargeReco
 scram b
 ```
+
 
 ## Produce extended nanoAOD files
 
