@@ -1,11 +1,36 @@
-# Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: --python_filename produceNano2016UL_cfg.py --eventcontent NANOEDMAODSIM --datatier NANOAODSIM --fileout file:nanox2016.root --conditions 106X_mcRun2_asymptotic_v17 --step NANO --filein /store/mc/RunIISummer20UL16MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_v13-v2/260000/8673D920-D951-E648-A9BE-5F177802CD5B.root --era Run2_2016,run2_nanoAOD_106Xv1 --no_exec --mc -n 100
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 from Configuration.StandardSequences.Eras import eras
+
+
+# 2016 preVPF
+# https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/EGM-RunIISummer20UL16NanoAODAPVv9-00001
+# MiniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16MiniAODAPVv2-106X_mcRun2_asymptotic_preVFP_v11-v1/MINIAODSIM
+# NanoAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM
+# era: Run2_2016_HIPM,run2_nanoAOD_106Xv2
+# conditions: 106X_mcRun2_asymptotic_preVFP_v11
+
+# 2016 
+# https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/EGM-RunIISummer20UL16NanoAODv9-00001
+# MiniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16MiniAODv2-Pilot_106X_mcRun2_asymptotic_v17-v1/MINIAODSIM
+# NanoAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODv9-Pilot_106X_mcRun2_asymptotic_v17-v1/NANOAODSIM
+# era: Run2_2016,run2_nanoAOD_106Xv2
+# conditions: 106X_mcRun2_asymptotic_v17
+
+# 2017
+# https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/SUS-RunIISummer20UL17NanoAODv9-00047
+# MiniAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
+# NanoAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM
+# era: Run2_2017,run2_nanoAOD_106Xv2
+# conditions: 106X_mc2017_realistic_v9 (NB: PPD still recommends 106X_mc2017_realistic_v8)
+
+# 2018
+# https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/SUS-RunIISummer20UL18NanoAODv9-00011
+# MiniAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM
+# NanoAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+# era: Run2_2018,run2_nanoAOD_106Xv2
+# conditions: 106X_upgrade2018_realistic_v16_L1v1 (NB: PPD still recommends 106X_upgrade2018_realistic_v15_L1v1)
+
 
 
 options = VarParsing ('analysis')
@@ -42,12 +67,14 @@ print "isData:", options.isData
 if options.year not in ['2016','2016preVFP','2017','2018']:
     raise Exception('Year options needs to be one of the following: '+str(['2016','2016preVFP','2017','2018']))
 
-if options.year=='2016' or options.year=='2016preVFP':
-    process = cms.Process('NANO',eras.Run2_2016,eras.run2_nanoAOD_106Xv1)
+if options.year=='2016preVFP':
+    process = cms.Process('NANO',eras.Run2_2016_HIPM,eras.run2_nanoAOD_106Xv2)
+elif options.year=='2016':
+    process = cms.Process('NANO',eras.Run2_2016,eras.run2_nanoAOD_106Xv2)
 elif options.year=='2017':
-    process = cms.Process('NANO',eras.Run2_2017,eras.run2_nanoAOD_106Xv1)
+    process = cms.Process('NANO',eras.Run2_2017,eras.run2_nanoAOD_106Xv2)
 elif options.year=='2018':
-    process = cms.Process('NANO',eras.Run2_2018,eras.run2_nanoAOD_106Xv1)
+    process = cms.Process('NANO',eras.Run2_2018,eras.run2_nanoAOD_106Xv2)
 
 
 
@@ -75,19 +102,19 @@ process.maxEvents = cms.untracked.PSet(
 
 inputFiles = {
     '2016preVFP': {
-        'mc': ['/store/mc/RunIISummer20UL16MiniAODAPV/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v8-v1/270000/F8E1C8DC-C55C-0141-86A6-9BA6ED714733.root'],
+        'mc': ['/store/mc/RunIISummer20UL16MiniAODAPVv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/70000/2EE3B436-E445-A440-A629-89CE2962EC9B.root'],
         'data': ['?']
     },
     '2016': {
-        'mc': ['/store/mc/RunIISummer20UL16MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_v13-v2/260000/8673D920-D951-E648-A9BE-5F177802CD5B.root'],
+        'mc': ['/store/mc/RunIISummer20UL16MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Pilot_106X_mcRun2_asymptotic_v17-v1/70000/14F6D33C-661A-D744-B931-0EBCABD6E27B.root'],
         'data': ['?'],
     },
     '2017': {
-        'mc': ['/store/mc/RunIISummer19UL17MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v2/260000/F27A3A53-2B4C-E846-B8E2-440CC8FCD255.root'],
+        'mc': ['/store/mc/RunIISummer20UL17MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/240000/7220A5E5-6A1A-3044-82B5-CAFFD3D81C47.root'],
         'data': ['?'],
     },
     '2018': {
-        'mc': ['/store/mc/RunIISummer19UL18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/100000/0537A477-C32D-154E-9A17-A4792914E8B6.root'],
+        'mc': ['/store/mc/RunIISummer20UL18MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/30000/13DAEBC6-FFB3-344C-A87A-8D466EE34A9D.root'],
         'data': ['?']
     }
 }
@@ -158,11 +185,11 @@ globalTags = {
         'data': '106X_dataRun2_v35',
     },
     '2017': {
-        'mc': '106X_mc2017_realistic_v8',
+        'mc': '106X_mc2017_realistic_v9',
         'data': '106X_dataRun2_v35',
     },
     '2018': {
-        'mc': '106X_upgrade2018_realistic_v15_L1v1',
+        'mc': '106X_upgrade2018_realistic_v16_L1v1',
         'data': '106X_dataRun2_v35'
     }
 }
