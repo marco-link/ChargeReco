@@ -2,15 +2,20 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 from Configuration.StandardSequences.Eras import eras
 
+# general notes:
+# RunIISummer19UL should not be used (wrong beamspot) 
+# for NanoAODv9 use RunIISummer20UL*MiniAODv2 as input; not v1!!!
+# condition for data: 106X_dataRun2_v35 (all years)
 
-# 2016 preVPF
+# 2016 preVPF (Run2016*-HIPM only)
 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/EGM-RunIISummer20UL16NanoAODAPVv9-00001
 # MiniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16MiniAODAPVv2-106X_mcRun2_asymptotic_preVFP_v11-v1/MINIAODSIM
+#          /WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16MiniAODAPVv2-106X_mcRun2_asymptotic_preVFP_v11-v1/MINIAODSIM
 # NanoAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM
 # era: Run2_2016_HIPM,run2_nanoAOD_106Xv2
 # conditions: 106X_mcRun2_asymptotic_preVFP_v11
 
-# 2016 
+# 2016
 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/EGM-RunIISummer20UL16NanoAODv9-00001
 # MiniAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16MiniAODv2-Pilot_106X_mcRun2_asymptotic_v17-v1/MINIAODSIM
 # NanoAOD: /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODv9-Pilot_106X_mcRun2_asymptotic_v17-v1/NANOAODSIM
@@ -22,14 +27,14 @@ from Configuration.StandardSequences.Eras import eras
 # MiniAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17MiniAODv2-106X_mc2017_realistic_v9-v1/MINIAODSIM
 # NanoAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM
 # era: Run2_2017,run2_nanoAOD_106Xv2
-# conditions: 106X_mc2017_realistic_v9 (NB: PPD still recommends 106X_mc2017_realistic_v8)
+# conditions: 106X_mc2017_realistic_v9
 
 # 2018
 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/SUS-RunIISummer20UL18NanoAODv9-00011
 # MiniAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM
 # NanoAOD: /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
 # era: Run2_2018,run2_nanoAOD_106Xv2
-# conditions: 106X_upgrade2018_realistic_v16_L1v1 (NB: PPD still recommends 106X_upgrade2018_realistic_v15_L1v1)
+# conditions: 106X_upgrade2018_realistic_v16_L1v1
 
 
 
@@ -83,7 +88,6 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
-process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('PhysicsTools.NanoAOD.nano_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -102,20 +106,23 @@ process.maxEvents = cms.untracked.PSet(
 
 inputFiles = {
     '2016preVFP': {
-        'mc': ['/store/mc/RunIISummer20UL16MiniAODAPVv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/70000/2EE3B436-E445-A440-A629-89CE2962EC9B.root'],
-        'data': ['?']
+        'mc': [
+            #'/store/mc/RunIISummer20UL16MiniAODAPVv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/70000/2EE3B436-E445-A440-A629-89CE2962EC9B.root',
+            'root://xrootd-cms.infn.it//store/mc/RunIISummer20UL16MiniAODAPVv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/270000/15EBBBC2-3FF5-2C4C-AF48-C0EEECE9DA37.root'
+        ],
+        'data': ['/store/data/Run2016B/SingleMuon/MINIAOD/ver2_HIPM_UL2016_MiniAODv2-v2/120000/0042DCA3-FD73-4641-B984-636AA05DFB55.root']
     },
     '2016': {
         'mc': ['/store/mc/RunIISummer20UL16MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Pilot_106X_mcRun2_asymptotic_v17-v1/70000/14F6D33C-661A-D744-B931-0EBCABD6E27B.root'],
-        'data': ['?'],
+        'data': ['/store/data/Run2016F/SingleMuon/MINIAOD/UL2016_MiniAODv2-v2/70000/060F0B51-FCEF-F343-890C-3043A4B268C2.root'],
     },
     '2017': {
         'mc': ['/store/mc/RunIISummer20UL17MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/240000/7220A5E5-6A1A-3044-82B5-CAFFD3D81C47.root'],
-        'data': ['?'],
+        'data': ['/store/data/Run2017B/SingleMuon/MINIAOD/UL2017_MiniAODv2-v1/260000/9032A966-8ED0-B645-97B6-A8EBC1D8D3B9.root'],
     },
     '2018': {
         'mc': ['/store/mc/RunIISummer20UL18MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/30000/13DAEBC6-FFB3-344C-A87A-8D466EE34A9D.root'],
-        'data': ['?']
+        'data': ['/store/data/Run2018A/SingleMuon/MINIAOD/UL2018_MiniAODv2-v2/120000/009F0BE4-A168-794F-8A07-DBDEFA8111C5.root']
     }
 }
 
@@ -226,7 +233,7 @@ updateJetCollection(
 )
 
 process.jetChargeTagInfos = cms.EDProducer("JetChargeTagInfoProducer",
-    jets = cms.InputTag("updatedJets"),
+    jets = process.jetTable.src,
     muonSrc  = cms.InputTag("slimmedMuons"),
     electronSrc = cms.InputTag("slimmedElectrons"),
     shallow_tag_infos = cms.InputTag('pfDeepCSVTagInfosXTag'),
@@ -235,7 +242,7 @@ process.jetChargeTagInfos = cms.EDProducer("JetChargeTagInfoProducer",
 )
 
 process.nanoTable = cms.EDProducer("NANOProducer",
-    srcJets = cms.InputTag("finalJets"),
+    srcJets = process.jetTable.src,
     srcTags = cms.InputTag("jetChargeTagInfos"),
 )
 
@@ -247,7 +254,7 @@ process.patJetPartons = cms.EDProducer('HadronAndPartonSelector',
      fullChainPhysPartons = cms.bool(True)
 )
 process.jetFlavourAssociation = cms.EDProducer("JetFlavourClustering",
-     jets = cms.InputTag("updatedJets"),
+     jets = process.jetTable.src,
      bHadrons = cms.InputTag("patJetPartons","bHadrons"),
      cHadrons = cms.InputTag("patJetPartons","cHadrons"),
      partons = cms.InputTag("patJetPartons","physicsPartons"),
@@ -261,13 +268,13 @@ process.jetFlavourAssociation = cms.EDProducer("JetFlavourClustering",
 
 process.jetChargeLabels = cms.EDProducer(
     "JetChargeLabelProducer",
-    srcJets = cms.InputTag("updatedJets"), #need to be same input as for 'jetFlavourAssociation'
+    srcJets = process.jetTable.src, #need to be same input as for 'jetFlavourAssociation'
     customFlavourAssociation = cms.InputTag("jetFlavourAssociation")
 )
    
 
 process.nanoGenTable = cms.EDProducer("NANOGenProducer",
-    srcJets = cms.InputTag("finalJets"),
+    srcJets = process.jetTable.src,
     srcLabels = cms.InputTag("jetChargeLabels")
 )
     
@@ -390,21 +397,31 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOoutput_step = cms.EndPath(process.NANOoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOoutput_step)
+if options.isData:
+    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step_mu,process.wbwbxnanoAOD_step_ele,process.endjob_step,process.NANOoutput_step)
+else:
+    process.schedule = cms.Schedule(process.wbwbxnanoAOD_step,process.endjob_step,process.NANOoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 
-from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeMC 
-process = nanoAOD_customizeMC(process)
+from PhysicsTools.NanoAOD.nano_cff import *
+if options.isData:
+    process = nanoAOD_customizeData(process)
+else:
+    process = nanoAOD_customizeMC(process)
 
 
 #remove unneeded modules
 modulesToRemove = [
-    "HTXSCategoryTable",
-    "rivetProducerHTXS",
     "l1bits",
 ]
+
+if not options.isData:
+    modulesToRemove.extend([
+        "HTXSCategoryTable",
+        "rivetProducerHTXS",
+    ])
 
 for moduleName in modulesToRemove:
     if hasattr(process,moduleName):

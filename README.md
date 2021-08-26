@@ -11,7 +11,7 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 cmsrel CMSSW_10_6_27
 cd CMSSW_10_6_27/src
 cmsenv
-git clone https://github.com/WbWbX/ChargeReco.git -b UL ChargeReco
+git clone git@github.com:WbWbX/ChargeReco.git -b UL ChargeReco
 scram b
 ```
 

@@ -156,7 +156,7 @@ JetChargeTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
         std::unordered_set<reco::CandidatePtr, CandidateHash> jetConstituentSet;
 
-        bool badJet = 0;
+        /*bool badJet = 0;
         for (unsigned int idaughter = 0; idaughter < jet.numberOfDaughters(); ++idaughter)
         {
             jetConstituentSet.insert(jet.daughterPtr(idaughter));
@@ -165,10 +165,10 @@ JetChargeTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
                 edm::LogWarning("BadTransverseMomentum") << "dropping jet with input candidate with inf";
                 badJet = 1;
             }
-        }
+        }*/
 
         // Cut on eta
-        if (std::abs(jet.eta()) > 2.5 or badJet) continue;
+        //if (std::abs(jet.eta()) > 2.5 or badJet) continue;
 
         /*
         float NHF  = jet.neutralHadronEnergyFraction();
