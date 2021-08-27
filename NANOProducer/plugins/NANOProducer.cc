@@ -386,6 +386,9 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     unsigned int ntags = tag_infos->size();
 
+    std::vector<int> badConstituent;
+    std::vector<int> outOfAcceptance;
+
     std::vector<int> global_jetIdx;
     std::vector<int> csv_jetIdx;
     std::vector<int> cpf_jetIdx;
@@ -473,6 +476,9 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         
         globalFillerList.push_back(features.jet_features);
         csvFillerList.push_back(features.tag_info_features);
+
+        badConstituent.push_back(features.badConstituent);
+        outOfAcceptance.push_back(features.outOfAcceptance);
     }
 
     auto muonTable = std::make_unique<nanoaod::FlatTable>(nmu_total, "muon", false, false);
@@ -545,6 +551,8 @@ NANOProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     
     globalTable->addColumn<int>("jetIdx", global_jetIdx, "linked jet Idx", nanoaod::FlatTable::IntColumn);
+    globalTable->addColumn<int>("badConstituent", badConstituent, "", nanoaod::FlatTable::IntColumn);
+    globalTable->addColumn<int>("outOfAcceptance", outOfAcceptance, "", nanoaod::FlatTable::IntColumn);
     globalFillerList.fill(globalTable);
     
     csvTable->addColumn<int>("jetIdx", csv_jetIdx, "linked jet Idx", nanoaod::FlatTable::IntColumn);

@@ -156,36 +156,25 @@ JetChargeTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
         std::unordered_set<reco::CandidatePtr, CandidateHash> jetConstituentSet;
 
-        /*bool badJet = 0;
+        wbwbx::JetChargeTagFeatures features;
+        features.npv = vtxs->size();
+
+
         for (unsigned int idaughter = 0; idaughter < jet.numberOfDaughters(); ++idaughter)
         {
             jetConstituentSet.insert(jet.daughterPtr(idaughter));
             const pat::PackedCandidate* constituent = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(idaughter));
-            if (std::isinf(constituent->pt())){
-                edm::LogWarning("BadTransverseMomentum") << "dropping jet with input candidate with inf";
-                badJet = 1;
+            if (std::fabs(constituent->eta()) > 6. or constituent->pt()>1e5 or std::isnan(constituent->pt()) or std::isinf(constituent->pt())) {
+                edm::LogWarning("BadTransverseMomentum") << "dropping jet with input candidate with nan/inf";
+                features.badConstituent = true;
             }
-        }*/
-
-        // Cut on eta
-        //if (std::abs(jet.eta()) > 2.5 or badJet) continue;
-
-        /*
-        float NHF  = jet.neutralHadronEnergyFraction();
-        float NEMF = jet.neutralEmEnergyFraction();
-        float CHF  = jet.chargedHadronEnergyFraction();
-        float MUF  = jet.muonEnergyFraction();
-        float CEMF = jet.chargedEmEnergyFraction();
-        int NumConst = jet.chargedMultiplicity()+jet.neutralMultiplicity();
-        int NumNeutralParticles =jet.neutralMultiplicity();
-        float CHM      = jet.chargedMultiplicity();
-
-        int looseJetID = (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(jet.eta())<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(jet.eta())>2.4) && abs(jet.eta())<=2.7;
-        */
-
-        // create data containing structure
-        wbwbx::JetChargeTagFeatures features;
+        }
         
+        if (features.badConstituent)
+        {
+            output_tag_infos->emplace_back(features, jet_ref); //add stub to keep ordering and move to next jet
+            continue;
+        }
 
         // Start with global jet features
         const float uncorrectedPt = jet.correctedP4("Uncorrected").pt();
@@ -206,7 +195,12 @@ JetChargeTagInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
         features.jet_features.chargedMuEnergyFraction = jet.chargedMuEnergyFraction();
         features.jet_features.electronEnergyFraction = jet.electronEnergyFraction();
 
-        features.npv = vtxs->size();
+        if (std::fabs(jet.eta())>2.5)
+        {
+            features.outOfAcceptance = true;
+            output_tag_infos->emplace_back(features, jet_ref); //add stub to keep ordering and move to next jet
+            continue;
+        }
         
         wbwbx::JetSubstructure jetSubstructure(jet);
         

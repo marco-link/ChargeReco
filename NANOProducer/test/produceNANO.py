@@ -351,7 +351,7 @@ if options.isData:
     
     
     process.selecteJetsForFilter = cms.EDFilter("CandViewSelector",
-        src = cms.InputTag("slimmedJets"),
+        src = process.jetTable.src,
         cut = cms.string("pt>25")
     )
     process.selectedJetsMinFilter = cms.EDFilter("CandViewCountFilter",
@@ -415,12 +415,19 @@ else:
 #remove unneeded modules
 modulesToRemove = [
     "l1bits",
+    "lowPtElectronTable",
+
+    "patJetCorrFactorsTransientCorrectedAK8WithDeepInfo",
+    "pfParticleNetMassRegressionJetTagsAK8WithDeepInfo",
+    "pfParticleNetTagInfosAK8WithDeepInfo"
 ]
 
 if not options.isData:
     modulesToRemove.extend([
         "HTXSCategoryTable",
         "rivetProducerHTXS",
+
+        "lowPtElectronMCTable"
     ])
 
 for moduleName in modulesToRemove:

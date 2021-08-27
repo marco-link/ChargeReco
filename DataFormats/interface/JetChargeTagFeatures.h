@@ -24,6 +24,15 @@ class JetChargeTagFeatures {
     std::vector<ElectronCandidateFeatures> elec_features;
     
     std::size_t npv;
+    bool badConstituent;
+    bool outOfAcceptance;
+
+    JetChargeTagFeatures():
+      npv(0),
+      badConstituent(false),
+      outOfAcceptance(false)
+    {
+    }
     
 };
 
