@@ -12,6 +12,10 @@ cmsrel CMSSW_10_6_27
 cd CMSSW_10_6_27/src
 cmsenv
 git clone git@github.com:WbWbX/ChargeReco.git -b UL ChargeReco
+mkdir TopQuarkAnalysis
+cd TopQuarkAnalysis
+git clone https://gitlab.cern.ch/CMS-TOPPAG/BFragmentationAnalyzer.git
+cd -
 scram b
 ```
 
