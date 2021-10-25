@@ -109,6 +109,7 @@ inputFiles = {
         'mc': [
             #'/store/mc/RunIISummer20UL16MiniAODAPVv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/70000/2EE3B436-E445-A440-A629-89CE2962EC9B.root',
             'root://xrootd-cms.infn.it//store/mc/RunIISummer20UL16MiniAODAPVv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/270000/15EBBBC2-3FF5-2C4C-AF48-C0EEECE9DA37.root'
+            # '/store/mc/RunIISummer20UL16MiniAODAPVv2/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v1/120000/0230C4F8-6445-F74C-8409-27F77DFDE107.root'
         ],
         'data': ['/store/data/Run2016B/SingleMuon/MINIAOD/ver2_HIPM_UL2016_MiniAODv2-v2/120000/0042DCA3-FD73-4641-B984-636AA05DFB55.root']
     },
@@ -207,8 +208,30 @@ if options.isData:
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, globalTags[options.year]['mc'], '')
     jetCorrectionsAK4PFchs = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-    
-    
+
+# b-fragmentation from Sebastien Werz
+# https://github.com/swertz/cmssw/blob/8c978990eae9f9dedd147595bc03c5b7c76aa69a/PhysicsTools/NanoAOD/python/particlelevel_cff.py
+
+from  PhysicsTools.NanoAOD.jets_cff import genJetTable
+from GeneratorInterface.RivetInterface.particleLevel_cfi import particleLevel as originalParticleLevel
+process.particleLevelWithNeutrinos = originalParticleLevel.clone(src=cms.InputTag("genParticles2HepMC:unsmeared"), excludeNeutrinosFromJetClustering=cms.bool(False))
+
+from TopQuarkAnalysis.BFragmentationAnalyzer.bfragWgtProducer_cfi import bfragWgtProducer as _bfragWgtProducer
+process.bfragWgtProducer = _bfragWgtProducer.clone(src=cms.InputTag("particleLevelWithNeutrinos:jets"))
+
+bFragWeights = []
+bFragWeights += [ cms.InputTag("bfragWgtProducer", variation + "VsPt") for variation in process.bfragWgtProducer.frag_weights_vs_pt ]
+bFragWeights += [ cms.InputTag("bfragWgtProducer", variation)  for variation in process.bfragWgtProducer.br_weights ]
+
+process.genJetBFragWeightTable = cms.EDProducer("GenJetBFragWeightTableProducer",
+    name = genJetTable.name,
+    weightSrc = cms.VInputTag(*bFragWeights),
+    genJets = genJetTable.src,
+    genJetsWithNu = process.bfragWgtProducer.src,
+    cut = genJetTable.cut,
+    deltaR = cms.double(0.2),
+    precision = cms.int32(10),
+)
 
 from PhysicsTools.NanoAOD.common_cff import *
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
@@ -386,7 +409,10 @@ else:
         process.jetChargeTagInfos+
         process.jetChargeLabels+
         process.nanoTable+
-        process.nanoGenTable
+        process.nanoGenTable+
+        process.particleLevelWithNeutrinos+
+        process.bfragWgtProducer+
+        process.genJetBFragWeightTable
     )
     
     if options.addSignalLHE:
