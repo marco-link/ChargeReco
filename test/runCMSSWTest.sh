@@ -13,8 +13,8 @@ function run_test()
     echo
     echo "==================== compiling ================"
     scram b || return 1
-    wget -nv https://raw.githubusercontent.com/WbWbX/test-files/main/RunIISummer20UL_miniAODv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root 
-    cmsRun ChargeReco/NANOProducer/test/produceNANO.py inputFiles=file:WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root year=2016preVFP
+    wget -nv https://raw.githubusercontent.com/WbWbX/test-files/main/RunIISummer20UL_miniAODv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root  || return 1
+    cmsRun ChargeReco/NANOProducer/test/produceNANO.py inputFiles=file:WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root year=2016preVFP || return 1
 }
 
 run_test
