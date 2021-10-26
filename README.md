@@ -2,6 +2,10 @@
 
 Production of extended nanoAOD ntuples for analysis and training of b jet charge classfier.
 
+[![NANOX production](https://github.com/WbWbX/ChargeReco/actions/workflows/main.yml/badge.svg)](https://github.com/WbWbX/ChargeReco/actions/workflows/main.yml)
+
+Tests are defined in [test/runCMSSWTest.sh](https://github.com/WbWbX/ChargeReco/blob/UL/test/runCMSSWTest.sh)
+
 
 ## Checkout instructions
 
