@@ -13,7 +13,7 @@ function run_test()
     mkdir -p TopQuarkAnalysis || return 1
     cd TopQuarkAnalysis || return 1
     git clone https://github.com/WbWbX/BFragmentationAnalyzer.git || return 1
-    cd - || return 1
+    cd $CMSSW_BASE/src || return 1
 
     echo
     echo "==================== compiling ================"
