@@ -18,7 +18,7 @@ cmsenv
 git clone git@github.com:WbWbX/ChargeReco.git -b UL ChargeReco
 mkdir TopQuarkAnalysis
 cd TopQuarkAnalysis
-git clone https://gitlab.cern.ch/CMS-TOPPAG/BFragmentationAnalyzer.git
+git clone git@github.com:WbWbX/BFragmentationAnalyzer.git
 cd -
 scram b
 ```
