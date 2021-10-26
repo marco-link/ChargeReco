@@ -8,8 +8,13 @@ function run_test()
     scramv1 project CMSSW CMSSW_10_6_27 || return 1
     cd CMSSW_10_6_27/src || return 1
     eval `scram runtime -sh` || return 1
-    mkdir -p ChargeReco
+    mkdir -p ChargeReco || return 1
     rsync -r --stats /scripts/ ChargeReco/. || return 1
+    mkdir -p TopQuarkAnalysis || return 1
+    cd TopQuarkAnalysis || return 1
+    git clone git@github.com:WbWbX/BFragmentationAnalyzer.git || return 1
+    cd - || return 1
+
     echo
     echo "==================== compiling ================"
     scram b || return 1
