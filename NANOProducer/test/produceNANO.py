@@ -67,6 +67,8 @@ options.parseArguments()
 
 print "Year:", options.year
 print "isData:", options.isData
+if len(options.inputFiles)>0:
+    print "take input files from arguments:", options.inputFiles
 
 
 if options.year not in ['2016','2016preVFP','2017','2018']:
@@ -133,10 +135,13 @@ process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring()
 )
 
-if options.isData:
-    process.source.fileNames = inputFiles[options.year]['data']
+if len(options.inputFiles)>0:
+    process.source.fileNames = options.inputFiles
 else:
-    process.source.fileNames = inputFiles[options.year]['mc']
+    if options.isData:
+        process.source.fileNames = inputFiles[options.year]['data']
+    else:
+        process.source.fileNames = inputFiles[options.year]['mc']
 
 
 process.options = cms.untracked.PSet(
