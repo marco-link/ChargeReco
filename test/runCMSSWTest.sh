@@ -12,7 +12,7 @@ function run_test()
     rsync -r --stats /scripts/ ChargeReco/. || return 1
     mkdir -p TopQuarkAnalysis || return 1
     cd TopQuarkAnalysis || return 1
-    git clone git@github.com:WbWbX/BFragmentationAnalyzer.git || return 1
+    git clone https://github.com/WbWbX/BFragmentationAnalyzer.git || return 1
     cd - || return 1
 
     echo
