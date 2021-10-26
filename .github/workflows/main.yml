@@ -1,0 +1,19 @@
+name: NANOX production
+
+on:
+  push:
+    branches: [ UL ]
+  pull_request:
+    branches: [ UL ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Testing NANOX production
+      run: |
+        docker pull clelange/cc7-cmssw-cvmfs
+        docker run --rm --privileged -v $PWD:/scripts:ro --device /dev/fuse clelange/cc7-cmssw-cvmfs /bin/bash -c /scripts/test/runCMSSWTest.sh
+  

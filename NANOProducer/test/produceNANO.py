@@ -67,6 +67,8 @@ options.parseArguments()
 
 print "Year:", options.year
 print "isData:", options.isData
+if len(options.inputFiles)>0:
+    print "take input files from arguments:", options.inputFiles
 
 
 if options.year not in ['2016','2016preVFP','2017','2018']:
@@ -101,7 +103,7 @@ else:
     dataTier = cms.untracked.string('NANOAODSIM')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(1000)
 )
 
 inputFiles = {
@@ -118,7 +120,10 @@ inputFiles = {
         'data': ['/store/data/Run2016F/SingleMuon/MINIAOD/UL2016_MiniAODv2-v2/70000/060F0B51-FCEF-F343-890C-3043A4B268C2.root'],
     },
     '2017': {
-        'mc': ['/store/mc/RunIISummer20UL17MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/240000/7220A5E5-6A1A-3044-82B5-CAFFD3D81C47.root'],
+        'mc': [
+            #'/store/mc/RunIISummer20UL17MiniAODv2/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/240000/7220A5E5-6A1A-3044-82B5-CAFFD3D81C47.root'
+            'root://xrootd-cms.infn.it//store/mc/RunIISummer20UL17MiniAODv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/250000/00261815-B757-8B41-8031-97F67D9940BF.root',
+        ],
         'data': ['/store/data/Run2017B/SingleMuon/MINIAOD/UL2017_MiniAODv2-v1/260000/9032A966-8ED0-B645-97B6-A8EBC1D8D3B9.root'],
     },
     '2018': {
@@ -134,10 +139,13 @@ process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring()
 )
 
-if options.isData:
-    process.source.fileNames = inputFiles[options.year]['data']
+if len(options.inputFiles)>0:
+    process.source.fileNames = options.inputFiles
 else:
-    process.source.fileNames = inputFiles[options.year]['mc']
+    if options.isData:
+        process.source.fileNames = inputFiles[options.year]['data']
+    else:
+        process.source.fileNames = inputFiles[options.year]['mc']
 
 
 process.options = cms.untracked.PSet(
