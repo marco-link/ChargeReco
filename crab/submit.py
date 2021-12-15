@@ -27,6 +27,9 @@ def verifySample(sample):
     if result == "VALIDVALID":
         print(GREEN + sample  + RESET)
         return True
+    elif result == "PRODUCTION":
+        print(BLUE + sample  + RESET)
+        return True
     else:
         print(RED + sample + ' is ' + result + RESET)
         return False
@@ -57,6 +60,7 @@ print(args)
 tag = os.path.splitext(os.path.basename(args.input))[0]
 isData = 'isData=True' if args.data else 'isData=False'
 
+
 if args.year not in years:
     raise Exception('year "{}" not found, available options: {}'.format(args.year, ', '.join(years)))
 
@@ -73,7 +77,6 @@ config.General.transferOutputs = True
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '../NANOProducer/test/produceNANO.py'
-config.JobType.scriptArgs = [isData, 'year={}'.format(args.year)]
 #config.JobType.inputFiles = ['']
 config.JobType.maxMemoryMB = 2500
 #config.JobType.numCores = 1
@@ -88,6 +91,9 @@ config.Data.publication = True
 config.Data.outLFNDirBase = '/store/user/mlink/Wb_{}/{}/'.format(args.version, tag)
 ##config.Data.totalUnits = 2
 config.Data.outputDatasetTag = 'WbAnalysis_ChargeReco_{}_{}'.format(tag, args.version)
+config.Data.allowNonValidInputDataset = True # FIXME currently required for in production datasets
+
+
 
 
 config.section_("Site")
@@ -113,6 +119,14 @@ with open(args.input, 'r') as samplefile:
                 continue
 
             requestName = sample.split('/')[1]
+
+            # LHE container not available for diboson samples
+            addSignalLHE = 'addSignalLHE=1'
+            if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
+                addSignalLHE = 'addSignalLHE=0'
+
+            config.JobType.scriptArgs = ['year={}'.format(args.year), isData, addSignalLHE]
+
 
             if 'USER' in sample:
                 config.Data.inputDBS = 'phys03'
