@@ -50,7 +50,7 @@ options.register(
 
 options.register(
     'addSignalLHE',
-    True,
+    False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "adds LHE weights of signal samples"
@@ -67,6 +67,8 @@ options.parseArguments()
 
 print "Year:", options.year
 print "isData:", options.isData
+print "addSignalLHE:", options.addSignalLHE
+
 if len(options.inputFiles)>0:
     print "take input files from arguments:", options.inputFiles
 
