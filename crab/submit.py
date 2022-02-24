@@ -77,6 +77,7 @@ config.General.transferOutputs = True
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '../NANOProducer/test/produceNANO.py'
+config.JobType.outputFiles = ['nanox.root']
 #config.JobType.inputFiles = ['']
 config.JobType.maxMemoryMB = 2500
 #config.JobType.numCores = 1
@@ -94,8 +95,6 @@ config.Data.outputDatasetTag = 'WbAnalysis_ChargeReco_{}_{}'.format(tag, args.ve
 config.Data.allowNonValidInputDataset = True # FIXME currently required for in production datasets
 
 
-
-
 config.section_("Site")
 config.Site.storageSite = 'T1_DE_KIT_Disk'
 #config.Site.blacklist = ['T2_US_*']
@@ -103,7 +102,7 @@ config.Site.storageSite = 'T1_DE_KIT_Disk'
 
 config.section_("User")
 config.User.voGroup = 'dcms'
-config.JobType.outputFiles = ['nanox.root']
+
 
 
 
@@ -119,10 +118,12 @@ with open(args.input, 'r') as samplefile:
                 continue
 
             requestName = sample.split('/')[1]
+            if args.data:
+                requestName = sample.split('-')[0].replace('/', '_')[1:]
 
             # LHE container not available for diboson samples
             addSignalLHE = 'addSignalLHE=1'
-            if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
+            if args.data or 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
                 addSignalLHE = 'addSignalLHE=0'
 
             config.JobType.scriptArgs = ['year={}'.format(args.year), isData, addSignalLHE]
@@ -140,7 +141,7 @@ with open(args.input, 'r') as samplefile:
             config.Data.inputDataset = sample
 
             # save config
-            with open('{}_{}.py'.format(tag, requestName), 'w') as f:
+            with open('{}_{}.py'.format(args.year, requestName), 'w') as f:
                 print >> f, config
 
 
