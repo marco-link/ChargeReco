@@ -58,8 +58,6 @@ args = parser.parse_args()
 print(args)
 
 tag = os.path.splitext(os.path.basename(args.input))[0]
-isData = 'isData=True' if args.data else 'isData=False'
-
 
 if args.year not in years:
     raise Exception('year "{}" not found, available options: {}'.format(args.year, ', '.join(years)))
@@ -126,7 +124,7 @@ with open(args.input, 'r') as samplefile:
             if args.data or 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
                 addSignalLHE = 'addSignalLHE=0'
 
-            config.JobType.scriptArgs = ['year={}'.format(args.year), isData, addSignalLHE]
+            config.JobType.pyCfgParams = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
 
 
             if 'USER' in sample:
