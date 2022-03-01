@@ -380,30 +380,15 @@ if options.isData:
         process.selectedElectronsForFilter+process.selectedElectronsMinFilter
     )
     
-    
-    process.selecteJetsForFilter = cms.EDFilter("CandViewSelector",
-        src = process.jetTable.src,
-        cut = cms.string("pt>25")
-    )
-    process.selectedJetsMinFilter = cms.EDFilter("CandViewCountFilter",
-        src = cms.InputTag("selecteJetsForFilter"),
-        minNumber = cms.uint32(2)
-    )
-    
-    process.jetsFilterSequence = cms.Sequence(
-        process.selecteJetsForFilter+process.selectedJetsMinFilter
-    )
 
     process.wbwbxnanoAOD_step_mu = cms.Path(
         process.muonFilterSequence+
-        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable
     )
     process.wbwbxnanoAOD_step_ele = cms.Path(
         process.electronFilterSequence+
-        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable
