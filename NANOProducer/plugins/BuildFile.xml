@@ -6,6 +6,9 @@
 <use name="DataFormats/Common"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="xerces-c"/>
+<use name="CommonTools/MVAUtils"/>
+
+
 <library file="LHEWeightsProducer.cc" name="LHEWeightsProducerPlugin">
     <flags EDM_PLUGIN="1"/>
 </library>
@@ -13,6 +16,9 @@
     <flags EDM_PLUGIN="1"/>
 </library>
 <library file="NANOGenProducer.cc" name="NANOGenProducer">
+    <flags EDM_PLUGIN="1"/>
+</library>
+<library file="GenJetBFragWeightTableProducer.cc" name="GenJetBFragWeightTableProducer">
     <flags EDM_PLUGIN="1"/>
 </library>
 
