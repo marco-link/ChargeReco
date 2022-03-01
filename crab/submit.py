@@ -87,9 +87,9 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.publication = True
-config.Data.outLFNDirBase = '/store/user/mlink/Wb_{}/{}/'.format(args.version, tag)
+config.Data.outLFNDirBase = '/store/user/mlink/WbChargeReco/{}/{}/'.format(args.version, tag)
 ##config.Data.totalUnits = 2
-config.Data.outputDatasetTag = 'WbAnalysis_ChargeReco_{}_{}'.format(tag, args.version)
+config.Data.outputDatasetTag = 'WbChargeReco_{}_{}'.format(tag, args.version)
 config.Data.allowNonValidInputDataset = True # FIXME currently required for in production datasets
 
 
