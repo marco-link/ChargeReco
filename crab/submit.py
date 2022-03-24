@@ -59,6 +59,7 @@ print(args)
 
 tag = os.path.splitext(os.path.basename(args.input))[0]
 
+
 if args.year not in years:
     raise Exception('year "{}" not found, available options: {}'.format(args.year, ', '.join(years)))
 
@@ -102,7 +103,6 @@ if args.data:
     elif '2018' in args.year:
         config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
 
-
 config.section_("Site")
 config.Site.storageSite = 'T1_DE_KIT_Disk'
 #config.Site.blacklist = ['T2_US_*']
@@ -135,6 +135,14 @@ with open(args.input, 'r') as samplefile:
                 addSignalLHE = 'addSignalLHE=0'
 
             config.JobType.pyCfgParams = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
+
+
+            # LHE container not available for diboson samples
+            addSignalLHE = 'addSignalLHE=1'
+            if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
+                addSignalLHE = 'addSignalLHE=0'
+
+            config.JobType.scriptArgs = ['year={}'.format(args.year), isData, addSignalLHE]
 
 
             if 'USER' in sample:
