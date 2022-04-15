@@ -91,7 +91,7 @@ config.Data.publication = True
 config.Data.outLFNDirBase = '/store/user/mlink/WbChargeReco/{}/{}/'.format(args.version, tag)
 ##config.Data.totalUnits = 2
 config.Data.outputDatasetTag = 'WbChargeReco_{}_{}'.format(tag, args.version)
-config.Data.allowNonValidInputDataset = True # FIXME currently required for in production datasets
+config.Data.allowNonValidInputDataset = False
 
 # lumi maksk from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
 config.Data.lumiMask = ''
@@ -142,7 +142,7 @@ with open(args.input, 'r') as samplefile:
             if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
                 addSignalLHE = 'addSignalLHE=0'
 
-            config.JobType.scriptArgs = ['year={}'.format(args.year), isData, addSignalLHE]
+            config.JobType.scriptArgs = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
 
 
             if 'USER' in sample:
