@@ -50,7 +50,7 @@ options.register(
 
 options.register(
     'addSignalLHE',
-    True,
+    False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "adds LHE weights of signal samples"
@@ -67,6 +67,8 @@ options.parseArguments()
 
 print "Year:", options.year
 print "isData:", options.isData
+print "addSignalLHE:", options.addSignalLHE
+
 if len(options.inputFiles)>0:
     print "take input files from arguments:", options.inputFiles
 
@@ -380,30 +382,15 @@ if options.isData:
         process.selectedElectronsForFilter+process.selectedElectronsMinFilter
     )
     
-    
-    process.selecteJetsForFilter = cms.EDFilter("CandViewSelector",
-        src = process.jetTable.src,
-        cut = cms.string("pt>25")
-    )
-    process.selectedJetsMinFilter = cms.EDFilter("CandViewCountFilter",
-        src = cms.InputTag("selecteJetsForFilter"),
-        minNumber = cms.uint32(2)
-    )
-    
-    process.jetsFilterSequence = cms.Sequence(
-        process.selecteJetsForFilter+process.selectedJetsMinFilter
-    )
 
     process.wbwbxnanoAOD_step_mu = cms.Path(
         process.muonFilterSequence+
-        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable
     )
     process.wbwbxnanoAOD_step_ele = cms.Path(
         process.electronFilterSequence+
-        process.jetsFilterSequence+
         process.nanoSequence+
         process.jetChargeTagInfos+
         process.nanoTable

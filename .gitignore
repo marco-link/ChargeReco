@@ -5,3 +5,6 @@
 __init__.py
 
 crab/crab*
+crab/mc*.py
+crab/20*.py
+NANOProducer/test/datasets/mc_*.txt

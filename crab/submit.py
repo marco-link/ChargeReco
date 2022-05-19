@@ -27,6 +27,9 @@ def verifySample(sample):
     if result == "VALIDVALID":
         print(GREEN + sample  + RESET)
         return True
+    elif result == "PRODUCTION":
+        print(BLUE + sample  + RESET)
+        return True
     else:
         print(RED + sample + ' is ' + result + RESET)
         return False
@@ -55,7 +58,7 @@ args = parser.parse_args()
 print(args)
 
 tag = os.path.splitext(os.path.basename(args.input))[0]
-isData = 'isData=True' if args.data else 'isData=False'
+
 
 if args.year not in years:
     raise Exception('year "{}" not found, available options: {}'.format(args.year, ', '.join(years)))
@@ -73,9 +76,9 @@ config.General.transferOutputs = True
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '../NANOProducer/test/produceNANO.py'
-config.JobType.scriptArgs = [isData, 'year={}'.format(args.year)]
+config.JobType.outputFiles = ['nanox.root']
 #config.JobType.inputFiles = ['']
-config.JobType.maxMemoryMB = 2500
+config.JobType.maxMemoryMB = 3000
 #config.JobType.numCores = 1
 #config.JobType.sendExternalFolder = True
 
@@ -85,10 +88,20 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.publication = True
-config.Data.outLFNDirBase = '/store/user/mlink/Wb_{}/{}/'.format(args.version, tag)
+config.Data.outLFNDirBase = '/store/user/mlink/WbChargeReco/{}/{}/'.format(args.version, tag)
 ##config.Data.totalUnits = 2
-config.Data.outputDatasetTag = 'WbAnalysis_ChargeReco_{}_{}'.format(tag, args.version)
+config.Data.outputDatasetTag = 'WbChargeReco_{}_{}'.format(tag, args.version)
+config.Data.allowNonValidInputDataset = False
 
+# lumi maksk from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
+config.Data.lumiMask = ''
+if args.data:
+    if '2016' in args.year:
+        config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+    elif '2017' in args.year:
+        config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
+    elif '2018' in args.year:
+        config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
 
 config.section_("Site")
 config.Site.storageSite = 'T1_DE_KIT_Disk'
@@ -97,7 +110,7 @@ config.Site.storageSite = 'T1_DE_KIT_Disk'
 
 config.section_("User")
 config.User.voGroup = 'dcms'
-config.JobType.outputFiles = ['nanox.root']
+
 
 
 
@@ -113,6 +126,24 @@ with open(args.input, 'r') as samplefile:
                 continue
 
             requestName = sample.split('/')[1]
+            if args.data:
+                requestName = sample.split('-')[0].replace('/', '_')[1:]
+
+            # LHE container not available for diboson samples
+            addSignalLHE = 'addSignalLHE=1'
+            if args.data or 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
+                addSignalLHE = 'addSignalLHE=0'
+
+            config.JobType.pyCfgParams = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
+
+
+            # LHE container not available for diboson samples
+            addSignalLHE = 'addSignalLHE=1'
+            if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
+                addSignalLHE = 'addSignalLHE=0'
+
+            config.JobType.scriptArgs = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
+
 
             if 'USER' in sample:
                 config.Data.inputDBS = 'phys03'
@@ -126,7 +157,7 @@ with open(args.input, 'r') as samplefile:
             config.Data.inputDataset = sample
 
             # save config
-            with open('{}_{}.py'.format(tag, requestName), 'w') as f:
+            with open('{}_{}.py'.format(args.year, requestName), 'w') as f:
                 print >> f, config
 
 

@@ -14,12 +14,14 @@ function run_test()
     cd TopQuarkAnalysis || return 1
     git clone https://github.com/WbWbX/BFragmentationAnalyzer.git || return 1
     cd $CMSSW_BASE/src || return 1
-
     echo
     echo "==================== compiling ================"
     scram b || return 1
     wget -nv https://raw.githubusercontent.com/WbWbX/test-files/main/RunIISummer20UL_miniAODv2/WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root  || return 1
     cmsRun ChargeReco/NANOProducer/test/produceNANO.py inputFiles=file:WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8_2016_preVFP.root year=2016preVFP || return 1
+
+    wget -nv https://raw.githubusercontent.com/WbWbX/test-files/main/RunIISummer20UL_miniAODv2/SingleMuon_RunD_HIPM_UL2016_MiniAODv2-v2.root  || return 1
+    cmsRun ChargeReco/NANOProducer/test/produceNANO.py inputFiles=file:SingleMuon_RunD_HIPM_UL2016_MiniAODv2-v2.root year=2016preVFP isData=True || return 1
 }
 
 run_test

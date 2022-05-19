@@ -33,9 +33,18 @@ cmsRun ChargeReco/NANOProducer/test/produceNANO.py
 ```
 
 The cfg accepts the following options:
-* `isData` specifies if NanoAOD for data or MC is produced. Besides others MC will contain extra truth-level information (default: `False` = MC).
+* `isData` specifies if NanoAOD for data or MC is produced. Besides others MC will contain extra truth-level information (default: `0` = MC).
 * `year` controls the global tags and eras. Possible values are: `2016`, `2016preVFP`, `2017`, `2018` (default: `2016`).
 * `addSignalLHE` extracts and stores weights from the generator that are used to reweight the signal sample to different top quark widths (default: `False`).
+
+
+## job submission
+
+in `crab` folder run e.g.:
+```
+python2 submit.py -i datasets/data_2017.txt -y 2017 -v 2022-03-01_v6 --data
+```
+use `--dry` to skip job submission and only generate submit scripts
 
 
 ## Brief package overview
