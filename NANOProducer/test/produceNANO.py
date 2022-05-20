@@ -50,7 +50,7 @@ options.register(
 
 options.register(
     'addSignalLHE',
-    False,
+    True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "adds LHE weights of signal samples"
@@ -58,7 +58,7 @@ options.register(
 
 options.register(
     'year',
-    '2016',
+    '2016preVFP',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "add year file"
