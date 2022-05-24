@@ -50,7 +50,7 @@ options.register(
 
 options.register(
     'addSignalLHE',
-    False,
+    True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "adds LHE weights of signal samples"
@@ -58,7 +58,7 @@ options.register(
 
 options.register(
     'year',
-    '2016',
+    '2016preVFP',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "add year file"
@@ -397,6 +397,11 @@ if options.isData:
     )
 
 else:
+
+    if options.addSignalLHE:
+        process.genWeightsTable.namedWeightIDs = cms.vstring(["rwgt_%i"%(i) for i in range(1,106)])
+        process.genWeightsTable.namedWeightLabels = cms.vstring(["width_%i"%(i) for i in range(1,106)])
+
     process.wbwbxnanoAOD_step = cms.Path(
         process.nanoSequenceMC+
         process.patJetPartons+
@@ -410,8 +415,8 @@ else:
         process.genJetBFragWeightTable
     )
     
-    if options.addSignalLHE:
-        process.wbwbxnanoAOD_step += process.lheWeightsTable
+    # if options.addSignalLHE:
+    #     process.wbwbxnanoAOD_step += process.lheWeightsTable
   
 
 process.endjob_step = cms.EndPath(process.endOfProcess)

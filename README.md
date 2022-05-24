@@ -15,6 +15,9 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 cmsrel CMSSW_10_6_27
 cd CMSSW_10_6_27/src
 cmsenv
+git cms-addpkg PhysicsTools/NanoAOD
+git cms-cherry-pick-pr 38002 # adding sum of PS weights
+git cms-checkdeps -a -A
 git clone git@github.com:WbWbX/ChargeReco.git -b UL ChargeReco
 mkdir TopQuarkAnalysis
 cd TopQuarkAnalysis
