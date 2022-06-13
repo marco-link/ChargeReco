@@ -78,7 +78,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '../NANOProducer/test/produceNANO.py'
 config.JobType.outputFiles = ['nanox.root']
 #config.JobType.inputFiles = ['']
-config.JobType.maxMemoryMB = 3000
+config.JobType.maxMemoryMB = 2500
 #config.JobType.numCores = 1
 #config.JobType.sendExternalFolder = True
 
