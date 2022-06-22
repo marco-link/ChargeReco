@@ -130,20 +130,11 @@ with open(args.input, 'r') as samplefile:
                 requestName = sample.split('-')[0].replace('/', '_')[1:]
 
             # LHE container not available for diboson samples
-            addSignalLHE = 'addSignalLHE=1'
-            if args.data or 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
-                addSignalLHE = 'addSignalLHE=0'
+            addSignalLHE = 'addSignalLHE=0'
+            if 'WbjToLNu' in requestName:
+                addSignalLHE = 'addSignalLHE=1'
 
             config.JobType.pyCfgParams = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
-
-
-            # LHE container not available for diboson samples
-            addSignalLHE = 'addSignalLHE=1'
-            if 'WW_' in requestName or 'WZ_' in requestName or 'ZZ_' in requestName:
-                addSignalLHE = 'addSignalLHE=0'
-
-            config.JobType.scriptArgs = ['year={}'.format(args.year), 'isData={}'.format(int(args.data)), addSignalLHE]
-
 
             if 'USER' in sample:
                 config.Data.inputDBS = 'phys03'
