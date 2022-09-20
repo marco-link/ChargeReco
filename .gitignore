@@ -4,6 +4,7 @@
 *.a
 __init__.py
 
+crab/completed
 crab/crab*
 crab/mc*.py
 crab/20*.py
